@@ -1,3 +1,3 @@
-[submodule "theme"]
+[submodule "cmd/domain-panel/theme"]
 	path = cmd/domain-panel/theme
 	url = git@github.com:naiba/runcuo-theme.git
