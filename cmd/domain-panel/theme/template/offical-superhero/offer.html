@@ -1,0 +1,102 @@
+{{define "offical-superhero/offer.html"}} {{template "offical-superhero/header.html" .}}
+<section class="hero is-medium">
+    <div class="hero-body">
+        <div class="level">
+            <div class="level-item">
+                <div class="card is-info">
+                    <header class="card-header">
+                        <p class="card-header-title has-text-light">
+                            QiongBi.net 或许正在出售
+                        </p>
+                        <p class="card-header-icon">
+                            <span class="icon">
+                                <i class="fas fa-money-check-alt"></i>
+                            </span>
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="box">
+                            <p>穷逼。</p>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">来自</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <p class="control is-expanded has-icons-left">
+                                        <input class="input" type="text" placeholder="姓名">
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="field">
+                                    <p class="control is-expanded has-icons-left has-icons-right">
+                                        <input class="input is-success" type="email" placeholder="hi@example.com">
+                                        <span class="icon is-small is-left">
+                                            <i class="fas fa-envelope"></i>
+                                        </span>
+                                        <span class="icon is-small is-right">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field has-addons">
+                            <div class="field-label is-normal">
+                                <label class="label">出价</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field is-narrow">
+                                    <div class="control">
+                                        <span class="select">
+                                            <select>
+                                                <option>¥</option>
+                                                <option>$</option>
+                                                <option>€</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="您的出价">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">反机器人</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field g-recaptcha" data-sitekey="6LfQlWsUAAAAABvm5rFgCpmqGJJitynKiF_fePXR"></div>
+                            </div>
+                        </div>
+
+                        <div class="field is-horizontal">
+                            <div class="field-label">
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <button class="button is-primary">
+                                            提交
+                                        </button>
+                                        <a href="/" class="button">
+                                            了解更多域名
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{template "offical-superhero/footer.html" .}} {{end}}

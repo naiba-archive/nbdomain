@@ -1,0 +1,26 @@
+.domain-list {
+    margin-bottom: 20px;
+}
+
+.domain-list .is-one-fifth>.card .card-header-title {
+    padding-bottom: 0px;
+}
+
+.domain-soldout>del {
+    padding: 10px;
+    font-size: 24px;
+}
+
+.equal-height-card .card {
+    height: 100%;
+}
+
+#contact {
+    margin-bottom: 20px;
+}
+
+.main-card {
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
