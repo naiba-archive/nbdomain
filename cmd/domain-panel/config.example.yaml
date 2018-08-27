@@ -1,0 +1,7 @@
+web:
+  addr: 127.0.0.1:8080
+mail:
+  smtp: smtp.163.com:994
+  tls: true
+  user: example@163.com
+  pass: example

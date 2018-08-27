@@ -1,17 +1,17 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
-	"github.com/gin-gonic/gin"
+	"git.cm/nb/domain-panel"
+	"git.cm/nb/domain-panel/controller"
 )
 
+func init() {
+	log.Println("load config", panel.CF)
+}
+
 func main() {
-	r := gin.Default()
-	r.Static("static", "theme/static")
-	r.LoadHTMLGlob("theme/template/**/*")
-	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "offical-superhero/index.html", nil)
-	})
-	r.Run()
+	controller.Web()
+	select {}
 }
