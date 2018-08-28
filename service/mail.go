@@ -16,7 +16,7 @@ type MailService struct{}
 
 //SendMail 发送邮件
 func (ms MailService) SendMail(toMail, subj, body string) (flag bool) {
-	from := mail.Address{Address: panel.CF.Mail.User}
+	from := mail.Address{Name: "润措域名资产管理平台", Address: panel.CF.Mail.User}
 	to := mail.Address{Address: toMail}
 
 	// Setup headers
@@ -24,6 +24,7 @@ func (ms MailService) SendMail(toMail, subj, body string) (flag bool) {
 	headers["From"] = from.String()
 	headers["To"] = to.String()
 	headers["Subject"] = subj
+	headers["Content-Type"] = "text/html; charset=UTF-8"
 
 	// Setup message
 	message := ""
@@ -43,13 +44,20 @@ func (ms MailService) SendMail(toMail, subj, body string) (flag bool) {
 		ServerName:         host,
 	}
 
-	c, err := smtp.Dial(panel.CF.Mail.SMTP)
+	// Here is the key, you need to call tls.Dial instead of smtp.Dial
+	// for smtp servers running on 465 that require an ssl connection
+	// from the very beginning (no starttls)
+	conn, err := tls.Dial("tcp", panel.CF.Mail.SMTP, tlsconfig)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	c.StartTLS(tlsconfig)
+	c, err := smtp.NewClient(conn, host)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	// Auth
 	if err = c.Auth(auth); err != nil {
