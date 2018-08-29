@@ -16,7 +16,15 @@ type User struct {
 	Password string `json:"-"`
 	IsAdmin  bool
 	Token    string `gorm:"type:varchar(100);unique_index"`
+	Name     string
+	Phone    string
+	QQ       string
+	Weixin   string
 	Expire   time.Time
+
+	Domains []Domain
+	Panels  []Panel
+	Cats    []Cat
 }
 
 //GenerateToken 生成用户Token
