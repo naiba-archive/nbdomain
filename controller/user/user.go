@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"git.cm/nb/domain-panel"
-	"git.cm/nb/domain-panel/pkg/mygin"
 	"git.cm/nb/domain-panel/service"
 	"golang.org/x/crypto/bcrypt"
 
@@ -15,14 +14,19 @@ import (
 //Login 登录
 func Login(ctx *gin.Context) {
 	type loginForm struct {
-		Mail     string `form:"mail" binding:"required,email"`
-		Password string `form:"password" binding:"required,min=6"`
-		Gresp    string `form:"gresp" binding:"required,min=20"`
+		Mail      string `form:"mail" binding:"required,email"`
+		Password  string `form:"password" binding:"required,min=6"`
+		ReCaptcha string `form:"recaptcha" binding:"required,min=20"`
 	}
 	var lf loginForm
 	if err := ctx.ShouldBind(&lf); err != nil {
 		log.Println(err)
 		ctx.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
+		return
+	}
+	var cs service.CaptchaService
+	if success, host := cs.Verify(lf.ReCaptcha, ctx.ClientIP()); !success || host != panel.CF.Web.Domain {
+		ctx.String(http.StatusForbidden, "验证码不正确")
 		return
 	}
 	var u panel.User
@@ -34,18 +38,22 @@ func Login(ctx *gin.Context) {
 		ctx.String(http.StatusForbidden, "密码不正确")
 		return
 	}
-	u.GenerateToken()
-	mygin.SetCookie("token", u.Token, ctx)
-}
-
-type regForm struct {
-	Mail     string `form:"mail" binding:"required,email"`
-	Password string `form:"password" binding:"required,min=6"`
-	Verify   string `form:"verify" binding:"required,len=5"`
+	if err := u.GenerateToken(); err != nil {
+		log.Println("database error", err.Error())
+		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
+		return
+	}
+	ctx.JSON(http.StatusOK, u)
 }
 
 //Register 注册账号
 func Register(ctx *gin.Context) {
+	type regForm struct {
+		Name     string `form:"name" binding:"required,min=2,max=12"`
+		Mail     string `form:"mail" binding:"required,email"`
+		Password string `form:"password" binding:"required,min=6"`
+		Verify   string `form:"verify" binding:"required,len=5"`
+	}
 	var rf regForm
 	if err := ctx.ShouldBind(&rf); err != nil {
 		log.Println(err)
@@ -62,6 +70,7 @@ func Register(ctx *gin.Context) {
 	cs.Instance().Delete(cacheKey)
 	//用户入库
 	var u panel.User
+	u.Name = rf.Name
 	u.Mail = rf.Mail
 	bPass, err := bcrypt.GenerateFromPassword([]byte(rf.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -78,13 +87,22 @@ func Register(ctx *gin.Context) {
 	if u.ID == 1 {
 		u.IsAdmin = true
 	}
-	u.GenerateToken()
-	mygin.SetCookie("token", u.Token, ctx)
+	if err := u.GenerateToken(); err != nil {
+		log.Println("database error", err.Error())
+		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
+		return
+	}
+	ctx.JSON(http.StatusOK, u)
 }
 
 //ResetPassword 重置密码
 func ResetPassword(ctx *gin.Context) {
-	var rf regForm
+	type resetForm struct {
+		Mail     string `form:"mail" binding:"required,email"`
+		Password string `form:"password" binding:"required,min=6"`
+		Verify   string `form:"verify" binding:"required,len=5"`
+	}
+	var rf resetForm
 	if err := ctx.ShouldBind(&rf); err != nil {
 		log.Println(err)
 		ctx.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
@@ -116,5 +134,5 @@ func ResetPassword(ctx *gin.Context) {
 		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
 		return
 	}
-	mygin.SetCookie("token", u.Token, ctx)
+	ctx.JSON(http.StatusOK, u)
 }

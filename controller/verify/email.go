@@ -3,7 +3,6 @@ package verify
 import (
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"git.cm/nb/domain-panel"
@@ -15,9 +14,9 @@ import (
 )
 
 type mailForm struct {
-	Type  string `form:"type" binding:"required,alpha"`
-	Mail  string `form:"mail" binding:"required,email"`
-	Gresp string `form:"gresp" binding:"required,min=20"`
+	Type      string `form:"type" binding:"required,alpha"`
+	Mail      string `form:"mail" binding:"required,email"`
+	ReCaptcha string `form:"recaptcha" binding:"required,min=20"`
 }
 
 var typeMessage = map[string]string{
@@ -33,7 +32,7 @@ func Mail(ctx *gin.Context) {
 		return
 	}
 	var rs = service.CaptchaService{}
-	if success, host := rs.Verify(mf.Gresp, ctx.ClientIP()); !success || !strings.HasPrefix(ctx.Request.Host, host) {
+	if success, host := rs.Verify(mf.ReCaptcha, ctx.ClientIP()); !success || host != panel.CF.Web.Domain {
 		log.Println("ReCaptcha Resp =====>", success, host, ctx.Request.URL.Host)
 		ctx.String(http.StatusForbidden, "验证码错误，请重试")
 		return

@@ -28,8 +28,8 @@ type AuthOption struct {
 func Authorize(o AuthOption) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var u panel.User
-		token, err := ctx.Cookie("token")
-		if err != nil || len(token) != 32 || panel.DB.Where("token = ?", token).First(&u).Error != nil {
+		token := ctx.Request.Header.Get("Authorization")
+		if len(token) != 32 || panel.DB.Where("token = ?", token).First(&u).Error != nil {
 			if o.NeedAdmin || o.NeedUser {
 				ErrRedirect(ctx, "/", "登录状态已失效，请您重新登录。")
 				ctx.Abort()
@@ -80,7 +80,8 @@ func TmplVars(ctx *gin.Context, data TmplData) gin.H {
 
 //SetCookie 设置Cookie
 func SetCookie(k, v string, ctx *gin.Context) {
-	ctx.SetCookie(k, v, 60*60*24*365*2, "/", panel.CF.Web.Domain, false, false)
+	panic("can't set cookie in API")
+	//ctx.SetCookie(k, v, 60*60*24*365*2, "/", panel.CF.Web.Domain, false, false)
 }
 
 //ErrRedirect 使用JS跳转
