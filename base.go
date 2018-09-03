@@ -9,7 +9,8 @@ import (
 
 //Config 全局配置
 type Config struct {
-	Web struct {
+	Debug bool
+	Web   struct {
 		Addr   string
 		Domain string
 	}
@@ -49,5 +50,7 @@ func init() {
 		panic(err)
 	}
 	//Debug
-	DB = DB.Debug()
+	if CF.Debug {
+		DB = DB.Debug()
+	}
 }

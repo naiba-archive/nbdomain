@@ -32,3 +32,8 @@ func (u *User) GenerateToken() error {
 	u.Token = com.MD5(fmt.Sprintf("%d%d%s", u.ID, time.Now().UnixNano(), com.RandomString(10)))
 	return DB.Save(u).Error
 }
+
+//SID 字符串ID
+func (u User) SID() string {
+	return fmt.Sprintf("%d", u.ID)
+}

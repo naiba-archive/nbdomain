@@ -1,3 +1,5 @@
 .DS_Store
 vendor/
 cmd/domain-panel/config.yaml
+cmd/domain-panel/upload/logo/*
+!cmd/domain-panel/upload/logo/.gitkeep

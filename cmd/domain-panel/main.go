@@ -9,7 +9,7 @@ import (
 
 func init() {
 	log.Println("load config", panel.CF)
-	panel.DB.AutoMigrate(panel.User{})
+	panel.DB.AutoMigrate(panel.User{}, panel.Panel{})
 }
 
 func main() {
