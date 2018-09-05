@@ -37,7 +37,8 @@ func Web() {
 	panelRouter := r.Group("/")
 	{
 		panelRouter.GET("", mibiao.Index)
-		panelRouter.GET("/offer/:domain", mibiao.Offer)
+		panelRouter.GET("offer/:domain", mibiao.Offer)
+		panelRouter.GET("allowed", mibiao.Allow)
 	}
 	api := r.Group("/api")
 	{

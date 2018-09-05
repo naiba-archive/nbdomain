@@ -54,7 +54,7 @@ func Mail(ctx *gin.Context) {
 	code := com.RandomString(5)
 	ms := service.MailService{}
 	cs := service.CacheService{}
-	if !ms.SendMail(mf.Mail, msg, "您的验证码为："+code) {
+	if !ms.SendMail(mf.Mail, msg, "您的验证码为："+code+"（请将本邮箱加入邮件联系人列表）") {
 		ctx.String(http.StatusInternalServerError, "邮件发送失败，请联系客服处理")
 		return
 	}

@@ -16,15 +16,15 @@ type MailService struct{}
 
 //SendMail 发送邮件
 func (ms MailService) SendMail(toMail, subj, body string) (flag bool) {
-	from := mail.Address{Name: "润措域名资产管理平台", Address: panel.CF.Mail.User}
+	from := mail.Address{Name: "lifelongsender", Address: panel.CF.Mail.User}
 	to := mail.Address{Address: toMail}
 
 	// Setup headers
 	headers := make(map[string]string)
 	headers["From"] = from.String()
 	headers["To"] = to.String()
-	headers["Subject"] = subj
-	headers["Content-Type"] = "text/html; charset=UTF-8"
+	headers["Subject"] = subj + "（通知邮件）"
+	headers["Content-Type"] = "text/plain; charset=utf-8"
 
 	// Setup message
 	message := ""
