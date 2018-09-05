@@ -7,14 +7,13 @@ import (
 //Domain 域名
 type Domain struct {
 	gorm.Model
-	PanelID uint
 	UserID  uint
 	CatID   uint
-	Normal  string `gorm:"type:varchar(100);unique_index"`
-	Custom  string
+	PanelID uint
+	Domain  string `gorm:"type:varchar(100);unique_index"`
 	Desc    string
 
-	User  User
-	Panel Panel
-	Cat   Cat
+	User  User  `json:",omitempty"`
+	Panel Panel `json:",omitempty"`
+	Cat   Cat   `json:",omitempty"`
 }

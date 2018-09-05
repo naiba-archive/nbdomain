@@ -22,9 +22,9 @@ type User struct {
 	Weixin   string
 	Expire   time.Time
 
-	Domains []Domain
-	Panels  []Panel
-	Cats    []Cat
+	Domains []Domain `json:",omitempty"`
+	Panels  []Panel  `json:",omitempty"`
+	Cats    []Cat    `json:",omitempty"`
 }
 
 //GenerateToken 生成用户Token

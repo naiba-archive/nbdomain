@@ -6,7 +6,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"git.cm/nb/domain-panel"
@@ -15,7 +14,29 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var domainRegexp = regexp.MustCompile(`^[a-zA-Z0-9-]{1,63}(?:.[a-zA-Z]{2,})+$`)
+//ListCats 米表分类列表
+func ListCats(c *gin.Context) {
+	u := c.MustGet(mygin.KUser).(panel.User)
+	var p panel.Panel
+	if panel.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
+		c.String(http.StatusForbidden, "米表不存在")
+		return
+	}
+	panel.DB.Model(&p).Related(&p.Cats)
+	c.JSON(http.StatusOK, p.Cats)
+}
+
+//ListDomains 米表域名列表
+func ListDomains(c *gin.Context) {
+	u := c.MustGet(mygin.KUser).(panel.User)
+	var p panel.Panel
+	if panel.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
+		c.String(http.StatusForbidden, "米表不存在")
+		return
+	}
+	panel.DB.Model(&p).Related(&p.Domains)
+	c.JSON(http.StatusOK, p.Domains)
+}
 
 //List 米表列表
 func List(c *gin.Context) {
@@ -55,7 +76,7 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "输入数据不符合规范。")
 		return
 	}
-	if !domainRegexp.Match([]byte(pf.Domain)) {
+	if !panel.DomainRegexp.Match([]byte(pf.Domain)) {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}

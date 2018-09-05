@@ -13,7 +13,7 @@ type Cat struct {
 	NameEn  string
 	Index   int
 
-	Domains []Domain
-	Panel   Panel
-	User    User
+	Domains []Domain `json:",omitempty"`
+	Panel   *Panel   `json:",omitempty"`
+	User    *User    `json:",omitempty"`
 }

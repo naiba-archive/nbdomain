@@ -4,12 +4,41 @@ import (
 	"log"
 	"net/http"
 
+	"git.cm/nb/domain-panel/pkg/mygin"
+
 	"git.cm/nb/domain-panel"
 	"git.cm/nb/domain-panel/service"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
 )
+
+//Settings 个人设置
+func Settings(c *gin.Context) {
+	type SettingForm struct {
+		Name   string `binding:"required,min=2,max=12"`
+		Phone  string `binding:"required,min=2,max=20"`
+		Weixin string `binding:"required,min=2,max=20"`
+		QQ     string `binding:"required,min=2,max=20"`
+	}
+	var lf SettingForm
+	if err := c.ShouldBind(&lf); err != nil {
+		log.Println(err)
+		c.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
+		return
+	}
+	u := c.MustGet(mygin.KUser).(panel.User)
+	u.Weixin = lf.Weixin
+	u.QQ = lf.QQ
+	u.Phone = lf.Phone
+	u.Name = lf.Name
+	if err := panel.DB.Save(&u).Error; err != nil {
+		log.Println("database error", err.Error())
+		c.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
+		return
+	}
+	c.JSON(http.StatusOK, u)
+}
 
 //Login 登录
 func Login(ctx *gin.Context) {
