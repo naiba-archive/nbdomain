@@ -23,11 +23,11 @@ func checkExpire(c *gin.Context) bool {
 			return false
 		}
 		panel.DB.Model(&d).Related(&d.User)
-		panel.DB.Model(&d).Related(&d.Panel)
 		if d.User.Expire.Before(time.Now()) {
 			c.String(http.StatusOK, "域名停放已过期，请您及时续费。")
 			return false
 		}
+		panel.DB.Model(&d).Related(&d.Panel)
 		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.Panel.Domain+"/offer/"+domain)
 		return false
 	}
