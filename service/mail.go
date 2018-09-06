@@ -22,7 +22,7 @@ var mailRender = hermes.Hermes{
 		// Appears in header & footer of e-mails
 		Name: "日落域名资产管理平台",
 		Link: "https://www.riluo.cn/",
-		Logo: "https://www.riluo.cn/static/offical/logo.png",
+		Logo: "https://www.riluo.cn/static/offical/images/logo.png",
 	},
 }
 
@@ -54,11 +54,10 @@ func (ms MailService) SendMail(toMail, subj string, mail hermes.Email, mType int
 	m := gomail.NewMessage()
 	m.SetHeader("From", panel.CF.Mail.User)
 	m.SetHeader("To", toMail)
-	// m.SetAddressHeader("Cc", panel.CF.Mail.User, "LifelongSender")
+	m.SetAddressHeader("Cc", panel.CF.Mail.User, "LifelongSender")
 	m.SetHeader("Subject", subj)
 	m.SetBody(contentType, mailBody)
 	// m.Attach("/home/Alex/lolcat.jpg")
-
 	d := gomail.NewPlainDialer(panel.CF.Mail.SMTP, panel.CF.Mail.Port, panel.CF.Mail.User, panel.CF.Mail.Pass)
 	if err := d.DialAndSend(m); err != nil {
 		log.Println(err)
