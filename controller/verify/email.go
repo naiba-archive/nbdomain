@@ -7,6 +7,7 @@ import (
 
 	"git.cm/nb/domain-panel"
 
+	"github.com/matcornic/hermes"
 	"github.com/naiba/com"
 
 	"git.cm/nb/domain-panel/service"
@@ -54,7 +55,23 @@ func Mail(ctx *gin.Context) {
 	code := com.RandomString(5)
 	ms := service.MailService{}
 	cs := service.CacheService{}
-	if !ms.SendMail(mf.Mail, msg, "您的验证码为："+code+"（请将本邮箱加入邮件联系人列表）") {
+	if !ms.SendMail(mf.Mail, msg, hermes.Email{
+		Body: hermes.Body{
+			Name: mf.Mail,
+			Intros: []string{
+				"日落域名资产管理平台，域名投资，我们是认真的。",
+			},
+			Actions: []hermes.Action{
+				{
+					Instructions: "您的邮箱验证码是：",
+					Button: hermes.Button{
+						Color: "#22BC66",
+						Text:  code,
+					},
+				},
+			},
+		},
+	}, service.HTMLMail) {
 		ctx.String(http.StatusInternalServerError, "邮件发送失败，请联系客服处理")
 		return
 	}
