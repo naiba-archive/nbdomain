@@ -1,37 +1,38 @@
-# 润措域名资产管理平台
+# 日落域名资产管理平台
 
 ## 部署说明
 
 ### Caddy
 
 ```Caddyfile
-runcuo.com parking.runcuo.com {
-        redir https://www.runcuo.com{uri}
+riluo.cn parking.riluo.cn {
+	redir https://www.riluo.cn{uri}
 }
-www.runcuo.com {
-        tls 1@5.nu
-        root /home/www/runcuo/frontend
-        proxy /upload 127.0.0.1:8035 {
-                transparent
-                keepalive 10
-        }
-        proxy /api 127.0.0.1:8034 {
+www.riluo.cn {
+	tls 1@5.nu
+	root /home/www/runcuo/frontend
+	proxy /api 127.0.0.1:8034 {
                 transparent
                 keepalive 10
         }
 }
-localhost:8035 {
-        root /home/www/runcuo/upload/
+www.riluo.cn/upload/ {
+	root /home/www/runcuo/upload/
 }
-* {
-        tls {
-                ask http://127.0.0.1:8034/allowed
-        }
+www.riluo.cn/static/ {
+        root /home/www/runcuo/theme/static/
+}
+:80 {
         proxy / 127.0.0.1:8034 {
                 transparent
                 keepalive 10
         }
-        proxy /upload 127.0.0.1:8035 {
+}
+:443 {
+        tls {
+                ask http://127.0.0.1:8034/allowed
+        }
+        proxy / 127.0.0.1:8034 {
                 transparent
                 keepalive 10
         }

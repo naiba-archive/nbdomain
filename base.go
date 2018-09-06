@@ -18,6 +18,7 @@ type Config struct {
 	}
 	Mail struct {
 		SMTP string `mapstructure:"smtp"`
+		Port int
 		User string
 		Pass string
 	}

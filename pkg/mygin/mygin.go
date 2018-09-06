@@ -62,9 +62,9 @@ type TmplData struct {
 func TmplVars(ctx *gin.Context, data TmplData) gin.H {
 	all := make(map[string]interface{})
 	if len(data.Title) > 0 {
-		all["title"] = data.Title + " - 润措域名资产 runcuo.com"
+		all["title"] = data.Title + " - 日落域名资产 riluo.cn"
 	} else {
-		all["title"] = "润措域名资产管理平台 runcuo.com"
+		all["title"] = "日落域名资产管理平台 riluo.cn"
 	}
 	all["user"], _ = ctx.Get(KUser)
 	all["chinese"], _ = ctx.Get(KChinese)

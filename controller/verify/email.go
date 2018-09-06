@@ -20,8 +20,8 @@ type mailForm struct {
 }
 
 var typeMessage = map[string]string{
-	"reg":    "润措注册验证码",
-	"forget": "润措重置密码",
+	"reg":    "日落注册验证码",
+	"forget": "日落重置密码",
 }
 
 //Mail 邮箱验证码

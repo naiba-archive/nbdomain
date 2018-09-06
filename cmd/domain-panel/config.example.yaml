@@ -2,7 +2,8 @@ web:
   addr: 127.0.0.1:8080
   domain: localhost
 mail:
-  smtp: smtp.163.com:994
+  smtp: smtp.163.com
+  port: 994
   user: example@163.com
   pass: example
 database:
