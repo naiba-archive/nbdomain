@@ -99,7 +99,7 @@ func Offer(c *gin.Context) {
 	isChinese := c.GetBool("Chinese")
 	var title string
 	if isChinese {
-		title = d.Domain + " 或许可以出售 - " + p.NameEn
+		title = d.Domain + " 或许可以出售 - " + p.Name
 	} else {
 		title = d.Domain + " may be for sale - " + p.NameEn
 	}
