@@ -19,10 +19,14 @@ import (
 
 //Web start
 func Web() {
-	r := gin.Default()
-	if !panel.CF.Debug {
-		gin.SetMode(gin.ReleaseMode)
+	var mode string
+	if panel.CF.Debug {
+		mode = gin.DebugMode
+	} else {
+		mode = gin.ReleaseMode
 	}
+	gin.SetMode(mode)
+	r := gin.Default()
 	r.SetFuncMap(template.FuncMap{
 		"toLower": strings.ToLower,
 	})
@@ -33,6 +37,7 @@ func Web() {
 		conf.AddAllowMethods("DELETE")
 		conf.AddAllowHeaders("Authorization")
 		r.Use(cors.New(conf))
+		r.Static("static", "theme/static")
 	}
 	panelRouter := r.Group("/")
 	{

@@ -79,6 +79,7 @@ func Index(c *gin.Context) {
 		title = p.NameEn
 	}
 	c.HTML(http.StatusOK, "offical-superhero/index", gin.H{
+		"Static":  "//" + panel.CF.Web.Domain,
 		"Title":   title,
 		"Panel":   p,
 		"Chinese": isChinese,
@@ -104,6 +105,7 @@ func Offer(c *gin.Context) {
 		title = d.Domain + " may be for sale - " + p.NameEn
 	}
 	c.HTML(http.StatusOK, "offical-superhero/offer", gin.H{
+		"Static":  "//" + panel.CF.Web.Domain,
 		"Title":   title,
 		"Panel":   p,
 		"Domain":  d,
