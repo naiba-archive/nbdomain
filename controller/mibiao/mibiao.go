@@ -71,9 +71,17 @@ func Index(c *gin.Context) {
 	for i := 0; i < len(p.Cats); i++ {
 		panel.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
 	}
+	isChinese := c.GetBool("Chinese")
+	var title string
+	if isChinese {
+		title = p.Name
+	} else {
+		title = p.NameEn
+	}
 	c.HTML(http.StatusOK, "offical-superhero/index", gin.H{
+		"Title":   title,
 		"Panel":   p,
-		"Chinese": c.GetBool("Chinese"),
+		"Chinese": isChinese,
 	})
 }
 
@@ -88,10 +96,18 @@ func Offer(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "https://"+p.Domain)
 		return
 	}
+	isChinese := c.GetBool("Chinese")
+	var title string
+	if isChinese {
+		title = d.Domain + " 或许可以出售 - " + p.NameEn
+	} else {
+		title = d.Domain + " may be for sale - " + p.NameEn
+	}
 	c.HTML(http.StatusOK, "offical-superhero/offer", gin.H{
+		"Title":   title,
 		"Panel":   p,
 		"Domain":  d,
-		"Chinese": c.GetBool("Chinese"),
+		"Chinese": isChinese,
 	})
 }
 
