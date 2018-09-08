@@ -25,6 +25,7 @@ type User struct {
 	Domains []Domain `json:",omitempty"`
 	Panels  []Panel  `json:",omitempty"`
 	Cats    []Cat    `json:",omitempty"`
+	Offers  []Offer  `json:",omitempty"`
 }
 
 //GenerateToken 生成用户Token

@@ -14,6 +14,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//Offers 报价列表
+func Offers(c *gin.Context) {
+	u := c.MustGet(mygin.KUser).(panel.User)
+	panel.DB.Model(&u).Related(&u.Offers)
+	c.JSON(http.StatusOK, u.Offers)
+}
+
 //ListCats 米表分类列表
 func ListCats(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(panel.User)
