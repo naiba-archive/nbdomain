@@ -132,7 +132,7 @@ func Edit(c *gin.Context) {
 	}
 	p.Name = pf.Name
 	p.NameEn = pf.NameEn
-	p.Domain = pf.Domain
+	p.Domain = strings.ToLower(pf.Domain)
 	p.Desc = pf.Desc
 	p.DescEn = pf.DescEn
 	p.Analysis = pf.Analysis

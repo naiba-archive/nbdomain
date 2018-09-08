@@ -139,7 +139,7 @@ func Offer(c *gin.Context) {
 			return
 		}
 		var cs service.CaptchaService
-		if y, host := cs.Verify(of.Recaptcha, c.ClientIP()); !y || host != c.Param("domain") {
+		if y, host := cs.Verify(of.Recaptcha, c.ClientIP()); !y || host != strings.ToLower(p.Domain) {
 			c.String(http.StatusForbidden, "ReCaptcha验证未通过。")
 			return
 		}
