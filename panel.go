@@ -17,11 +17,12 @@ type Panel struct {
 	DescEn   string
 	Analysis string
 
-	User    User
-	Cats    []Cat
-	Domains []Domain
+	User    User     `json:",omitempty"`
+	Cats    []Cat    `json:",omitempty"`
+	Domains []Domain `json:",omitempty"`
 }
 
+//SID 字符串ID
 func (p Panel) SID() string {
 	return fmt.Sprintf("%d", p.ID)
 }

@@ -6,7 +6,13 @@ import (
 )
 
 func init() {
-	panel.DB.AutoMigrate(panel.User{}, panel.Panel{}, panel.Cat{}, panel.Domain{})
+	panel.DB.AutoMigrate(
+		panel.User{},
+		panel.Panel{},
+		panel.Cat{},
+		panel.Domain{},
+		panel.Offer{},
+	)
 }
 
 func main() {
