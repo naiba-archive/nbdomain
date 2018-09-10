@@ -157,6 +157,22 @@
   version = "1.1.5"
 
 [[projects]]
+  branch = "master"
+  digest = "1:e1a1d000b77f47be0725c31ae5c1747ebfb55baccd275d671a4aab3c62390bc4"
+  name = "github.com/likexian/whois-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2a3082919f1b4c463346655d09826ae07a6c843f"
+
+[[projects]]
+  branch = "master"
+  digest = "1:0a083643dabd8cefdcca25a7d77491fb0ab212c028262698bbe9611851595433"
+  name = "github.com/likexian/whois-parser-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0c255d82d8df804070bef011bffd26141c21a5a5"
+
+[[projects]]
   digest = "1:c568d7727aa262c32bdf8a3f7db83614f7af0ed661474b24588de635c20024c7"
   name = "github.com/magiconair/properties"
   packages = ["."]
@@ -422,6 +438,8 @@
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
     "github.com/jinzhu/gorm/dialects/mysql",
+    "github.com/likexian/whois-go",
+    "github.com/likexian/whois-parser-go",
     "github.com/matcornic/hermes",
     "github.com/naiba/com",
     "github.com/patrickmn/go-cache",

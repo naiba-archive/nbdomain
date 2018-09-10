@@ -11,6 +11,7 @@ import (
 	"git.cm/nb/domain-panel/controller/panelr"
 	"git.cm/nb/domain-panel/controller/user"
 	"git.cm/nb/domain-panel/controller/verify"
+	"git.cm/nb/domain-panel/controller/whois"
 	"git.cm/nb/domain-panel/pkg/mygin"
 
 	"github.com/gin-contrib/cors"
@@ -73,6 +74,7 @@ func Web() {
 			authUser.POST("domain", domain.Edit)
 			authUser.PUT("domain", domain.Edit)
 			authUser.DELETE("domain/:id", domain.Delete)
+			authUser.GET("whois/:domain", whois.Whois)
 		}
 	}
 	go r.Run(panel.CF.Web.Addr)

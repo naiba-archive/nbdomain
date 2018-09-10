@@ -3,6 +3,7 @@ package domain
 import (
 	"log"
 	"net/http"
+	"time"
 
 	panel "git.cm/nb/domain-panel"
 	"git.cm/nb/domain-panel/pkg/mygin"
@@ -24,11 +25,17 @@ func Delete(c *gin.Context) {
 //Edit 添加/修改域名
 func Edit(c *gin.Context) {
 	type EditForm struct {
-		CatID   uint `binding:"required,min=1"`
-		PanelID uint `binding:"required,min=1"`
-		ID      uint
-		Domain  string `binding:"required,min=1,max=64"`
-		Desc    string `binding:"required,min=1,max=200"`
+		CatID     uint `binding:"required,min=1"`
+		PanelID   uint `binding:"required,min=1"`
+		ID        uint
+		Create    time.Time //注册时间
+		Expire    time.Time //到期时间
+		Cost      int       `binding:"min=1"` //购入成本
+		Renew     int       `binding:"min=1"` //续费成本
+		Buy       time.Time //购入时间
+		Registrar string    `binding:"min=1,max=100"`
+		Domain    string    `binding:"required,min=1,max=64"`
+		Desc      string    `binding:"required,min=1,max=200"`
 	}
 	var ef EditForm
 	if err := c.ShouldBind(&ef); err != nil {
@@ -60,6 +67,12 @@ func Edit(c *gin.Context) {
 	d.Domain = ef.Domain
 	d.Desc = ef.Desc
 	d.UserID = u.ID
+	d.Create = ef.Create
+	d.Expire = ef.Expire
+	d.Buy = ef.Buy
+	d.Cost = ef.Cost
+	d.Renew = ef.Renew
+	d.Registrar = ef.Registrar
 
 	if err := panel.DB.Save(&d).Error; err != nil {
 		log.Println(err)
