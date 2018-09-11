@@ -1,0 +1,1 @@
+gox -osarch="linux/amd64"&&scp -P 1987 ./domain-panel_linux_amd64 root@web.sx.p4x.com:/home/www/runcuo/domain-panel_linux_amd64_new
