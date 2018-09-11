@@ -67,6 +67,7 @@ func Mail(ctx *gin.Context) {
 					Button: hermes.Button{
 						Color: "#22BC66",
 						Text:  code,
+						Link:  "#",
 					},
 				},
 			},

@@ -21,6 +21,7 @@ type Config struct {
 		Port int
 		User string
 		Pass string
+		SSL  bool `mapstructure:"ssl"`
 	}
 	Database struct {
 		User   string

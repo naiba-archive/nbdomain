@@ -5,6 +5,7 @@ web:
 mail:
   smtp: smtp.163.com
   port: 994
+  ssl: true
   user: example@163.com
   pass: example
 database:
