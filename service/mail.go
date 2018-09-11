@@ -58,7 +58,8 @@ func (ms MailService) SendMail(toMail, subj string, mail hermes.Email, mType int
 	m.SetHeader("Subject", subj)
 	m.SetBody(contentType, mailBody)
 	// m.Attach("/home/Alex/lolcat.jpg")
-	d := gomail.NewPlainDialer(panel.CF.Mail.SMTP, panel.CF.Mail.Port, panel.CF.Mail.User, panel.CF.Mail.Pass, panel.CF.Mail.SSL)
+	d := gomail.NewPlainDialer(panel.CF.Mail.SMTP, panel.CF.Mail.Port, panel.CF.Mail.User, panel.CF.Mail.Pass)
+	d.SSL = panel.CF.Mail.SSL
 	if err := d.DialAndSend(m); err != nil {
 		log.Println(err)
 		return false
