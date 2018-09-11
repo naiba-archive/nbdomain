@@ -47,6 +47,9 @@ func Web() {
 		panelRouter.GET("", mibiao.Index)
 		panelRouter.GET("offer/:domain", mibiao.Offer)
 		panelRouter.POST("offer/:domain", mibiao.Offer)
+		panelRouter.GET("offer/", func(c *gin.Context) {
+			c.Redirect(http.StatusMovedPermanently, "/")
+		})
 		panelRouter.GET("allowed", mibiao.Allow)
 	}
 	api := r.Group("/api")
