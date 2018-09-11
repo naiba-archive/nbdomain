@@ -75,12 +75,17 @@ func Edit(c *gin.Context) {
 		NameEn   string `form:"name_en" binding:"required,min=1,max=20"`
 		Desc     string `form:"desc_cn" binding:"required,min=1,max=255"`
 		DescEn   string `form:"desc_en" binding:"required,min=1,max=255"`
+		Theme    string `form:"theme" binding:"required"`
 		Analysis string `form:"ga" binding:"max=20"`
 	}
 	var pf PanelForm
 	if e := c.ShouldBind(&pf); e != nil {
 		log.Println(e)
 		c.String(http.StatusForbidden, "输入数据不符合规范。")
+		return
+	}
+	if _, has := panel.ThemeList[pf.Theme]; !has {
+		c.String(http.StatusForbidden, "主题不存在")
 		return
 	}
 	if !panel.DomainRegexp.Match([]byte(pf.Domain)) {
@@ -135,6 +140,7 @@ func Edit(c *gin.Context) {
 	p.Domain = strings.ToLower(pf.Domain)
 	p.Desc = pf.Desc
 	p.DescEn = pf.DescEn
+	p.Theme = pf.Theme
 	p.Analysis = pf.Analysis
 	if err := panel.DB.Save(&p).Error; err != nil {
 		log.Println(err)

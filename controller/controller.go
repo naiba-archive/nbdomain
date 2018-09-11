@@ -2,6 +2,7 @@ package controller
 
 import (
 	"html/template"
+	"net/http"
 	"strings"
 
 	"git.cm/nb/domain-panel"
@@ -39,6 +40,7 @@ func Web() {
 		conf.AddAllowHeaders("Authorization")
 		r.Use(cors.New(conf))
 		r.Static("static", "theme/static")
+		r.Static("upload", "upload/")
 	}
 	panelRouter := r.Group("/")
 	{
@@ -63,6 +65,9 @@ func Web() {
 			authUser.PUT("user", user.Settings)
 			authUser.GET("offers", panelr.Offers)
 			authUser.PUT("panel", panelr.Edit)
+			authUser.GET("themes", func(c *gin.Context) {
+				c.JSON(http.StatusOK, panel.ThemeList)
+			})
 			authUser.DELETE("panel/:id", panelr.Delete)
 			authUser.GET("panel/:id/cats", panelr.ListCats)
 			authUser.GET("panel/:id/domains", panelr.ListDomains)

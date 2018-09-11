@@ -42,6 +42,9 @@ func checkExpire(c *gin.Context) bool {
 		c.String(http.StatusForbidden, "域名停放已过期，请您及时续费。")
 		return false
 	}
+	if p.Theme == "" {
+		p.Theme = "sbdotsb"
+	}
 	c.Set("Panel", p)
 	c.Set("Chinese", strings.Contains(c.Request.Header.Get("accept-language"), "zh"))
 	return true
@@ -84,7 +87,7 @@ func Index(c *gin.Context) {
 	} else {
 		title = p.NameEn
 	}
-	c.HTML(http.StatusOK, "offical-superhero/index", gin.H{
+	c.HTML(http.StatusOK, p.Theme+"/index", gin.H{
 		"Static":  "//" + panel.CF.Web.Domain,
 		"Title":   title,
 		"Panel":   p,
@@ -116,7 +119,7 @@ func Offer(c *gin.Context) {
 		} else {
 			title = d.Domain + " may be for sale - " + p.NameEn
 		}
-		c.HTML(http.StatusOK, "offical-superhero/offer", gin.H{
+		c.HTML(http.StatusOK, p.Theme+"/offer", gin.H{
 			"Static":  "//" + panel.CF.Web.Domain,
 			"Title":   title,
 			"Panel":   p,
