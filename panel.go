@@ -13,9 +13,9 @@ var ThemeList = map[string]string{
 }
 
 //AnalysisTypes 米表统计类型
-var AnalysisTypes = map[int]string{
-	0: "谷歌统计",
-	1: "CNZZ",
+var AnalysisTypes = map[string]string{
+	"g": "谷歌统计",
+	"c": "CNZZ",
 }
 
 //Panel 米表
@@ -27,7 +27,7 @@ type Panel struct {
 	NameEn       string
 	Desc         string
 	DescEn       string
-	AnalysisType int
+	AnalysisType string
 	Analysis     string
 	Theme        string
 

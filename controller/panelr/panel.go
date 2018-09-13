@@ -77,7 +77,7 @@ func Edit(c *gin.Context) {
 		DescEn       string `form:"desc_en" binding:"required,min=1,max=255"`
 		Theme        string `form:"theme" binding:"required"`
 		Analysis     string `form:"ga" binding:"max=20"`
-		AnalysisType int    `form:"at"`
+		AnalysisType string `form:"at"`
 	}
 	var pf PanelForm
 	if e := c.ShouldBind(&pf); e != nil {

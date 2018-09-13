@@ -71,6 +71,9 @@ func Web() {
 			authUser.GET("themes", func(c *gin.Context) {
 				c.JSON(http.StatusOK, panel.ThemeList)
 			})
+			authUser.GET("analysis_types", func(c *gin.Context) {
+				c.JSON(http.StatusOK, panel.AnalysisTypes)
+			})
 			authUser.DELETE("panel/:id", panelr.Delete)
 			authUser.GET("panel/:id/cats", panelr.ListCats)
 			authUser.GET("panel/:id/domains", panelr.ListDomains)
