@@ -12,17 +12,24 @@ var ThemeList = map[string]string{
 	"sbdotsb":           "「烧饼」Doma.in",
 }
 
+//AnalysisTypes 米表统计类型
+var AnalysisTypes = map[int]string{
+	0: "谷歌统计",
+	1: "CNZZ",
+}
+
 //Panel 米表
 type Panel struct {
 	gorm.Model
-	UserID   uint
-	Domain   string `gorm:"type:varchar(100);unique_index"`
-	Name     string
-	NameEn   string
-	Desc     string
-	DescEn   string
-	Analysis string
-	Theme    string
+	UserID       uint
+	Domain       string `gorm:"type:varchar(100);unique_index"`
+	Name         string
+	NameEn       string
+	Desc         string
+	DescEn       string
+	AnalysisType int
+	Analysis     string
+	Theme        string
 
 	User    User     `json:",omitempty"`
 	Cats    []Cat    `json:",omitempty"`

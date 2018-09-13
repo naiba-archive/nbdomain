@@ -69,19 +69,24 @@ func Delete(c *gin.Context) {
 //Edit 添加/修改米表
 func Edit(c *gin.Context) {
 	type PanelForm struct {
-		ID       uint   `form:"id"`
-		Domain   string `form:"domain" binding:"required,min=3,max=63"`
-		Name     string `form:"name_cn" binding:"required,min=1,max=20"`
-		NameEn   string `form:"name_en" binding:"required,min=1,max=20"`
-		Desc     string `form:"desc_cn" binding:"required,min=1,max=255"`
-		DescEn   string `form:"desc_en" binding:"required,min=1,max=255"`
-		Theme    string `form:"theme" binding:"required"`
-		Analysis string `form:"ga" binding:"max=20"`
+		ID           uint   `form:"id"`
+		Domain       string `form:"domain" binding:"required,min=3,max=63"`
+		Name         string `form:"name_cn" binding:"required,min=1,max=20"`
+		NameEn       string `form:"name_en" binding:"required,min=1,max=20"`
+		Desc         string `form:"desc_cn" binding:"required,min=1,max=255"`
+		DescEn       string `form:"desc_en" binding:"required,min=1,max=255"`
+		Theme        string `form:"theme" binding:"required"`
+		Analysis     string `form:"ga" binding:"max=20"`
+		AnalysisType int    `form:"at"`
 	}
 	var pf PanelForm
 	if e := c.ShouldBind(&pf); e != nil {
 		log.Println(e)
 		c.String(http.StatusForbidden, "输入数据不符合规范。")
+		return
+	}
+	if _, has := panel.AnalysisTypes[pf.AnalysisType]; !has {
+		c.String(http.StatusForbidden, "米表统计类型不存在")
 		return
 	}
 	if _, has := panel.ThemeList[pf.Theme]; !has {
@@ -142,6 +147,7 @@ func Edit(c *gin.Context) {
 	p.DescEn = pf.DescEn
 	p.Theme = pf.Theme
 	p.Analysis = pf.Analysis
+	p.AnalysisType = pf.AnalysisType
 	if err := panel.DB.Save(&p).Error; err != nil {
 		log.Println(err)
 		c.String(http.StatusInternalServerError, "米表域名已有人添加")
