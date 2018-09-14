@@ -45,6 +45,14 @@ func Batch(c *gin.Context) {
 		c.String(http.StatusForbidden, "输入数据不符合规范。可留空但不可以乱填。")
 		return
 	}
+	for _, cat := range bf.Cats {
+		for _, domain := range cat.Domains {
+			if !panel.DomainRegexp.Match([]byte(domain.Domain)) {
+				c.String(http.StatusForbidden, domain.Domain+":域名格式不符合规范")
+				return
+			}
+		}
+	}
 	u := c.MustGet(mygin.KUser).(panel.User)
 	var p panel.Panel
 	if panel.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
@@ -134,6 +142,9 @@ func Edit(c *gin.Context) {
 	d.UserID = u.ID
 	d.Create = ef.Create
 	d.Expire = ef.Expire
+	if d.Expire.After(time.Now()) {
+		d.WhoisUpdate = time.Now()
+	}
 	d.Buy = ef.Buy
 	d.Cost = ef.Cost
 	d.Renew = ef.Renew
