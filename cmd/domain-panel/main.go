@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"git.cm/nb/domain-panel"
@@ -30,24 +29,26 @@ func main() {
 func updateWhois() {
 	var domains []panel.Domain
 	for {
-		panel.DB.Where("whois_update is NULL or DATEDIFF(now(),whois_update)>7", time.Now()).Find(&domains)
+		panel.DB.Where("whois_update is NULL or DATEDIFF(now(),whois_update)>7").Find(&domains)
 		for _, domain := range domains {
 			result, err := whois.Whois(domain.Domain)
+			var create, expire time.Time
+			var register string
 			if err == nil {
 				var parsed parser.WhoisInfo
 				parsed, err = parser.Parse(result)
 				if err == nil {
-					create, _ := parseTime(parsed.Registrar.CreatedDate)
-					expire, _ := parseTime(parsed.Registrar.ExpirationDate)
-					panel.DB.Model(&domain).UpdateColumns(panel.Domain{
-						Registrar:   parsed.Registrar.RegistrarName,
-						Create:      create,
-						Expire:      expire,
-						WhoisUpdate: time.Now(),
-					})
-					log.Println(domain)
+					create, _ = parseTime(parsed.Registrar.CreatedDate)
+					expire, _ = parseTime(parsed.Registrar.ExpirationDate)
+					register = parsed.Registrar.RegistrarName
 				}
 			}
+			panel.DB.Model(&domain).UpdateColumns(panel.Domain{
+				Registrar:   register,
+				Create:      create,
+				Expire:      expire,
+				WhoisUpdate: time.Now(),
+			})
 			time.Sleep(time.Minute)
 		}
 		time.Sleep(time.Hour)

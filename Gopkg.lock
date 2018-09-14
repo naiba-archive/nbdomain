@@ -10,12 +10,12 @@
   version = "v1.4.2"
 
 [[projects]]
-  digest = "1:46a054a232ea2b7f0a35398d682b433d26ba9975fce9197b1784824402059f5b"
+  digest = "1:b0baf96eb3f1387dfd368f38f1d9c91adb947239530014d1006540ccee7579b2"
   name = "github.com/Masterminds/sprig"
   packages = ["."]
   pruneopts = "UT"
-  revision = "6b2a58267f6a8b1dc8e2eb5519b984008fa85e8c"
-  version = "v2.15.0"
+  revision = "15f9564e7e9cf0da02a48e0d25f12a7b83559aa6"
+  version = "v2.16.0"
 
 [[projects]]
   digest = "1:8f5416c7f59da8600725ae1ff00a99af1da8b04c211ae6f3c8f8bcab0164f650"
@@ -106,12 +106,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:4e0aa2a8f7c5d6e125af6ed331f5389003429e4fb0747f6d4be9715f246800f0"
+  digest = "1:f9a5e090336881be43cfc1cf468330c1bdd60abdc9dd194e0b1ab69f4b94dd7c"
   name = "github.com/huandu/xstrings"
   packages = ["."]
   pruneopts = "UT"
-  revision = "55ae428c2ac4f74d7430952ef528631e656ac92c"
-  version = "v1.1.0"
+  revision = "f02667b379e2fb5916c3cda2cf31e0eb885d79f8"
+  version = "v1.2.0"
 
 [[projects]]
   digest = "1:1069357a2767ba898fd6c715fb15d005403e5becf9b2e747630fbdde2a340302"
@@ -189,12 +189,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:d4d17353dbd05cb52a2a52b7fe1771883b682806f68db442b436294926bbfafb"
+  digest = "1:0981502f9816113c9c8c4ac301583841855c8cf4da8c72f696b3ebedf6d0e4e5"
   name = "github.com/mattn/go-isatty"
   packages = ["."]
   pruneopts = "UT"
-  revision = "0360b2af4f38e8d38c7fce2a9f4e702702d73a39"
-  version = "v0.0.3"
+  revision = "6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c"
+  version = "v0.0.4"
 
 [[projects]]
   digest = "1:cdb899c199f907ac9fb50495ec71212c95cb5b0e0a8ee0800da0238036091033"
@@ -230,19 +230,19 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:15ec79d8fb23dafd2e3d8ac4e2c7e720a547a48802a348ca023887a2156f4e47"
+  digest = "1:d067e29db68c9ec4b4bf0ae7528df4b99bff28806195430e6d1a5d8cb7cef55a"
   name = "github.com/naiba/com"
   packages = ["."]
   pruneopts = "UT"
-  revision = "af6934f4184d1ec6b4bf63179aab88a4ddbb0205"
+  revision = "2fec78d5abba6893944c00b07b9cb43c3bfb2f16"
 
 [[projects]]
   branch = "master"
-  digest = "1:4daa045e1e1f3e23f4b07db6880cdf9f259dab65312dfe244a878e6070faaf77"
+  digest = "1:f611266e3ac01ab4adb6f1d67f6c1be82998d02f452faff450596658712d860b"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
   pruneopts = "UT"
-  revision = "d4647c9c7a84d847478d890b816b7d8b62b0b279"
+  revision = "be2c049b30ccd4d3fd795d6bf7dce74e42eeedaa"
 
 [[projects]]
   digest = "1:808cdddf087fb64baeae67b8dfaee2069034d9704923a3cb8bd96a995421a625"
@@ -269,15 +269,15 @@
   revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
 
 [[projects]]
-  digest = "1:bd1ae00087d17c5a748660b8e89e1043e1e5479d0fea743352cda2f8dd8c4f84"
+  digest = "1:6a4a11ba764a56d2758899ec6f3848d24698d48442ebce85ee7a3f63284526cd"
   name = "github.com/spf13/afero"
   packages = [
     ".",
     "mem",
   ]
   pruneopts = "UT"
-  revision = "787d034dfe70e44075ccc060d346146ef53270ad"
-  version = "v1.1.1"
+  revision = "d40851caa0d747393da1ffb28f7f9d8b4eeffebd"
+  version = "v1.1.2"
 
 [[projects]]
   digest = "1:516e71bed754268937f57d4ecb190e01958452336fa73dbac880894164e91c1f"
@@ -288,12 +288,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
-  digest = "1:8a020f916b23ff574845789daee6818daf8d25a4852419aae3f0b12378ba432a"
+  digest = "1:68ea4e23713989dc20b1bded5d9da2c5f9be14ff9885beef481848edd18c26cb"
   name = "github.com/spf13/jwalterweatherman"
   packages = ["."]
   pruneopts = "UT"
-  revision = "14d3d4c518341bea657dd8a226f5121c0ff8c9f2"
+  revision = "4a4406e478ca629068e7768fc33f3f044173c0a6"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:dab83a1bbc7ad3d7a6ba1a1cc1760f25ac38cdf7d96a5cdd55cd915a4f5ceaf9"
@@ -304,12 +304,12 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:4fc8a61287ccfb4286e1ca5ad2ce3b0b301d746053bf44ac38cf34e40ae10372"
+  digest = "1:6e30a27eac59a148b3f7a32e0ba54706b31dcde5a42f63b22cb47873b62fa343"
   name = "github.com/spf13/viper"
   packages = ["."]
   pruneopts = "UT"
-  revision = "907c19d40d9a6c9bb55f040ff4ae45271a4754b9"
-  version = "v1.1.0"
+  revision = "8fb642006536c8d3760c99d4fa2389f5e2205631"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -328,14 +328,6 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:4b94878e125f31ec67c892ecfe38c13211da40653281588598218f807ae72bf7"
-  name = "github.com/xuri/excelize"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "eb62256d165607c6877ce88efbba10c119137b3d"
-  version = "v1.3.0"
-
-[[projects]]
   branch = "master"
   digest = "1:b22cb6330a3836e3a562754b1a7315f3b1e19c96e906a37373ad1b24c9fc44d0"
   name = "golang.org/x/crypto"
@@ -346,26 +338,26 @@
     "scrypt",
   ]
   pruneopts = "UT"
-  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
-  digest = "1:0185c27476ac2aa653c9b932843b41409b9a42a8f38b09c8e25c8fb1fcd499c5"
+  digest = "1:a5ae8f624991c4156ab2610befdbc78ea3a961473ce4846cc34342649cb81878"
   name = "golang.org/x/net"
   packages = [
     "html",
     "html/atom",
   ]
   pruneopts = "UT"
-  revision = "8a410e7b638dca158bf9e766925842f6651ff828"
+  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
 
 [[projects]]
   branch = "master"
-  digest = "1:a3f00ac457c955fe86a41e1495e8f4c54cb5399d609374c5cc26aa7d72e542c8"
+  digest = "1:6eb2645d74b43d9c87b51947df39f7c668a4f422cd512053f7f6f75bfaad0197"
   name = "golang.org/x/sys"
   packages = ["unix"]
   pruneopts = "UT"
-  revision = "3b58ed4ad3395d483fc92d5d14123ce2c3581fec"
+  revision = "d0be0721c37eeb5299f245a996a483160fc36940"
 
 [[projects]]
   digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
