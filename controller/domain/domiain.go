@@ -3,6 +3,7 @@ package domain
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	panel "git.cm/nb/domain-panel"
@@ -20,6 +21,70 @@ func Delete(c *gin.Context) {
 		return
 	}
 	panel.DB.Delete(&d)
+}
+
+//Batch 批量导入域名
+func Batch(c *gin.Context) {
+	type BatchForm struct {
+		PanelID uint `binding:"required,min=1"`
+		Cats    []struct {
+			Name    string `binding:"required,min=1,max=20"`
+			NameEn  string `binding:"required,min=1,max=30"`
+			Domains []struct {
+				Cost   int `binding:"min=1"` //购入成本
+				Buy    time.Time
+				Renew  int    `binding:"min=1"` //续费成本
+				Domain string `binding:"required,min=1,max=64"`
+				Desc   string `binding:"required,min=1,max=200"`
+			}
+		}
+	}
+	var bf BatchForm
+	if err := c.ShouldBind(&bf); err != nil {
+		log.Println(err)
+		c.String(http.StatusForbidden, "输入数据不符合规范。可留空但不可以乱填。")
+		return
+	}
+	u := c.MustGet(mygin.KUser).(panel.User)
+	var p panel.Panel
+	if panel.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
+		c.String(http.StatusForbidden, "米表不存在。")
+		return
+	}
+	addedDomains := make([]panel.Domain, 0)
+	for _, catForm := range bf.Cats {
+		var cat panel.Cat
+		if panel.DB.Where("name = ? AND user_id = ?", strings.TrimSpace(catForm.Name), u.ID).First(&cat).Error != nil {
+			cat.Name = catForm.Name
+			cat.NameEn = catForm.NameEn
+			cat.UserID = u.ID
+			cat.PanelID = p.ID
+			if panel.DB.Save(&cat).Error != nil {
+				c.String(http.StatusInternalServerError, "数据库错误，联系管理员")
+				return
+			}
+		}
+		for _, domainForm := range catForm.Domains {
+			var domain panel.Domain
+			if panel.DB.Where("domain = ?", domainForm.Domain).First(&domain).Error == nil {
+				continue
+			}
+			domain.UserID = u.ID
+			domain.PanelID = p.ID
+			domain.CatID = cat.ID
+			domain.Buy = domainForm.Buy
+			domain.Cost = domainForm.Cost
+			domain.Renew = domainForm.Renew
+			domain.Domain = domainForm.Domain
+			domain.Desc = domainForm.Desc
+			if panel.DB.Save(&domain).Error != nil {
+				c.String(http.StatusInternalServerError, "数据库错误，联系管理员")
+				return
+			}
+			addedDomains = append(addedDomains, domain)
+		}
+	}
+	c.JSON(http.StatusOK, addedDomains)
 }
 
 //Edit 添加/修改域名

@@ -82,6 +82,7 @@ func Web() {
 			authUser.PUT("cat", cat.Edit)
 			authUser.POST("cat", cat.Edit)
 			authUser.GET("panels", panelr.List)
+			authUser.POST("batch", domain.Batch)
 			authUser.POST("domain", domain.Edit)
 			authUser.PUT("domain", domain.Edit)
 			authUser.DELETE("domain/:id", domain.Delete)
