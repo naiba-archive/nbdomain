@@ -16,7 +16,7 @@ import (
 //Whois whois 查询
 func Whois(c *gin.Context) {
 	domain := c.Param("domain")
-	if !panel.DomainRegexp.Match([]byte(domain)) {
+	if len(domain) < 4 {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}

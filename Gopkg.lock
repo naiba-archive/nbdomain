@@ -342,11 +342,12 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a5ae8f624991c4156ab2610befdbc78ea3a961473ce4846cc34342649cb81878"
+  digest = "1:9b2bd5085b63ae662f09591e3641156da6af260519bfd3ad6d61b27726d22145"
   name = "golang.org/x/net"
   packages = [
     "html",
     "html/atom",
+    "idna",
   ]
   pruneopts = "UT"
   revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
@@ -360,15 +361,23 @@
   revision = "d0be0721c37eeb5299f245a996a483160fc36940"
 
 [[projects]]
-  digest = "1:8029e9743749d4be5bc9f7d42ea1659471767860f0cdc34d37c3111bd308a295"
+  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
   name = "golang.org/x/text"
   packages = [
+    "collate",
+    "collate/build",
+    "internal/colltab",
     "internal/gen",
+    "internal/tag",
     "internal/triegen",
     "internal/ucd",
+    "language",
+    "secure/bidirule",
     "transform",
+    "unicode/bidi",
     "unicode/cldr",
     "unicode/norm",
+    "unicode/rangetable",
   ]
   pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
@@ -437,6 +446,7 @@
     "github.com/patrickmn/go-cache",
     "github.com/spf13/viper",
     "golang.org/x/crypto/bcrypt",
+    "golang.org/x/net/idna",
     "gopkg.in/gomail.v2",
   ]
   solver-name = "gps-cdcl"

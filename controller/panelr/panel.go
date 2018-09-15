@@ -93,7 +93,7 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "主题不存在")
 		return
 	}
-	if !panel.DomainRegexp.Match([]byte(pf.Domain)) {
+	if len(pf.Domain) < 4 {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}

@@ -47,7 +47,7 @@ func Batch(c *gin.Context) {
 	}
 	for _, cat := range bf.Cats {
 		for _, domain := range cat.Domains {
-			if !panel.DomainRegexp.Match([]byte(domain.Domain)) {
+			if len(domain.Domain) < 4 {
 				c.String(http.StatusForbidden, domain.Domain+":域名格式不符合规范")
 				return
 			}
@@ -116,7 +116,7 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "输入数据不符合规范。")
 		return
 	}
-	if !panel.DomainRegexp.Match([]byte(ef.Domain)) {
+	if len(ef.Domain) < 4 {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}

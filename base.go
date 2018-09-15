@@ -1,8 +1,6 @@
 package panel
 
 import (
-	"regexp"
-
 	"github.com/jinzhu/gorm"
 	//MySQL 驱动
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -38,8 +36,6 @@ var CF Config
 
 //DB 数据库连接
 var DB *gorm.DB
-
-var DomainRegexp = regexp.MustCompile(`^[a-zA-Z0-9-]{1,61}(?:\.[a-zA-Z]{2,})+$`)
 
 func init() {
 	//加载配置

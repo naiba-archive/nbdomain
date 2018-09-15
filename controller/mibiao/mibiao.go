@@ -10,12 +10,22 @@ import (
 	"git.cm/nb/domain-panel/service"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/net/idna"
 )
 
 func checkExpire(c *gin.Context) bool {
+	var err error
 	domain := stripPort(c.Request.Host)
+	log.Println(domain)
+	if strings.Contains(domain, "xn--") {
+		domain, err = idna.ToUnicode(domain)
+		if err != nil {
+			c.Redirect(http.StatusTemporaryRedirect, "https://"+panel.CF.Web.Domain)
+			return false
+		}
+	}
 	var p panel.Panel
-	err := panel.DB.Where("domain = ?", domain).First(&p).Error
+	err = panel.DB.Where("domain = ?", domain).First(&p).Error
 	if err != nil {
 		//不是米表，试试域名
 		var d panel.Domain
