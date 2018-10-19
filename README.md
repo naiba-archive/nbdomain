@@ -12,6 +12,8 @@ www.riluo.cn {
 	tls 1@5.nu
 	root /home/www/runcuo/frontend
 	proxy /api 127.0.0.1:8034 {
+				timeout 5m
+        		keepalive 50
                 transparent
                 keepalive 10
         }
@@ -24,6 +26,8 @@ www.riluo.cn/static/ {
 }
 :80 {
         proxy / 127.0.0.1:8034 {
+                timeout 5m
+                keepalive 50
                 transparent
                 keepalive 10
         }
@@ -33,6 +37,8 @@ www.riluo.cn/static/ {
                 ask http://127.0.0.1:8034/allowed
         }
         proxy / 127.0.0.1:8034 {
+        		timeout 5m
+        		keepalive 50
                 transparent
                 keepalive 10
         }
