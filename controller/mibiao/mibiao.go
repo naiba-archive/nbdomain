@@ -47,7 +47,7 @@ func checkExpire(c *gin.Context) bool {
 	}
 	//是米表，检查会员到期
 	panel.DB.Model(&p).Related(&p.User)
-	if p.User.GoldVIPExpire.Before(time.Now()) || p.User.SuperVIPExpire.Before(time.Now()) {
+	if p.User.GoldVIPExpire.Before(time.Now()) && p.User.SuperVIPExpire.Before(time.Now()) {
 		c.String(http.StatusForbidden, "您还不是会员，无法享用「米表」功能。")
 		return false
 	}
@@ -86,7 +86,7 @@ func Index(c *gin.Context) {
 		return
 	}
 	p := c.MustGet("Panel").(panel.Panel)
-	panel.DB.Model(&p).Related(&p.Cats)
+	panel.DB.Model(&p).Order("index").Association("cats").Find(&p.Cats)
 	for i := 0; i < len(p.Cats); i++ {
 		panel.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
 	}

@@ -21,7 +21,7 @@ func Whois(c *gin.Context) {
 		return
 	}
 	u := c.MustGet(mygin.KUser).(panel.User)
-	if u.Expire.Before(time.Now()) {
+	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
 		c.String(http.StatusForbidden, "会员到期")
 		return
 	}
