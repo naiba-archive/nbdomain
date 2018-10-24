@@ -269,6 +269,17 @@
   revision = "86672fcb3f950f35f2e675df2240550f2a50762f"
 
 [[projects]]
+  digest = "1:8016b7311eb2bb868fc6dc9c2de7f129d30cd9db2bb9d5b1d4713a86d3c4d761"
+  name = "github.com/smartwalle/alipay"
+  packages = [
+    ".",
+    "encoding",
+  ]
+  pruneopts = "UT"
+  revision = "e572d1192a284c3e3b3fd0c06bf3fabcbd6bce59"
+  version = "1.0"
+
+[[projects]]
   digest = "1:6a4a11ba764a56d2758899ec6f3848d24698d48442ebce85ee7a3f63284526cd"
   name = "github.com/spf13/afero"
   packages = [
@@ -444,6 +455,7 @@
     "github.com/matcornic/hermes",
     "github.com/naiba/com",
     "github.com/patrickmn/go-cache",
+    "github.com/smartwalle/alipay",
     "github.com/spf13/viper",
     "golang.org/x/crypto/bcrypt",
     "golang.org/x/net/idna",

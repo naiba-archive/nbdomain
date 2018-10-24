@@ -1,8 +1,10 @@
 package user
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"git.cm/nb/domain-panel/pkg/mygin"
 
@@ -11,7 +13,100 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/smartwalle/alipay"
 )
+
+var client = alipay.New(panel.CF.Alipay.Appid, "", panel.CF.Alipay.Pubkey, panel.CF.Alipay.Prikey, panel.CF.Alipay.Prod)
+
+func procNotify(nti *alipay.TradeNotification) error {
+	var o panel.Order
+	if err := panel.DB.Where("id = ?", nti.OutTradeNo).First(&o).Error; err != nil {
+		return err
+	}
+	if !o.Finish {
+		panel.DB.Model(&o).Related(&o.User)
+		if o.What == "gold" {
+			if o.User.GoldVIPExpire.Before(time.Now()) {
+				o.User.GoldVIPExpire = time.Now().Add(time.Hour * 24 * 30)
+			} else {
+				o.User.GoldVIPExpire = o.User.GoldVIPExpire.Add(time.Hour * 24 * 30)
+			}
+		} else {
+			if o.User.SuperVIPExpire.Before(time.Now()) {
+				o.User.SuperVIPExpire = time.Now().Add(time.Hour * 24 * 30)
+			} else {
+				o.User.SuperVIPExpire = o.User.SuperVIPExpire.Add(time.Hour * 24 * 30)
+			}
+		}
+		return panel.DB.Save(&o.User).Error
+	}
+	return nil
+}
+
+//Notify 异步回调
+func Notify(c *gin.Context) {
+	nti, err := client.GetTradeNotification(c.Request)
+	if err != nil {
+		c.String(http.StatusForbidden, "数据校验失败")
+		return
+	}
+	if err = procNotify(nti); err == nil {
+		c.String(http.StatusOK, "success")
+		return
+	}
+	c.String(http.StatusInternalServerError, err.Error())
+	return
+}
+
+//Return 同步回调
+func Return(c *gin.Context) {
+	nti, err := client.GetTradeNotification(c.Request)
+	if err != nil {
+		c.String(http.StatusForbidden, "数据校验失败")
+		return
+	}
+	if err = procNotify(nti); err == nil {
+		c.String(http.StatusOK, "续费成功，请重新登录")
+		return
+	}
+	c.String(http.StatusInternalServerError, err.Error())
+	return
+}
+
+//Pay 用户支付
+func Pay(c *gin.Context) {
+	what := c.Query("vip")
+	if what != "gold" && what != "super" {
+		c.String(http.StatusForbidden, what+"是什么会员？？")
+		return
+	}
+	u := c.MustGet(mygin.KUser).(panel.User)
+	var o panel.Order
+	o.UserID = u.ID
+	var p = alipay.AliPayTradePagePay{}
+	p.NotifyURL = panel.CF.Web.Domain + "/pay/notify"
+	p.ReturnURL = panel.CF.Web.Domain + "/pay/return"
+	p.TotalAmount = func() string {
+		if what == "gold" {
+			return "10.00"
+		}
+		return "30.00"
+	}()
+	p.Subject = "「" + what + "」会员续费"
+	o.What = what
+	if panel.DB.Save(&o).Error != nil {
+		c.String(http.StatusInternalServerError, "服务器错误，订单入库")
+		return
+	}
+	p.OutTradeNo = fmt.Sprintf("%d", o.ID)
+	var url, err = client.TradePagePay(p)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	var payURL = url.String()
+	c.Redirect(http.StatusFound, payURL)
+}
 
 //Settings 个人设置
 func Settings(c *gin.Context) {

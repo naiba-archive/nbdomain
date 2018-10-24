@@ -17,6 +17,7 @@ func init() {
 		panel.Cat{},
 		panel.Domain{},
 		panel.Offer{},
+		panel.Order{},
 	)
 }
 

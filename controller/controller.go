@@ -42,6 +42,11 @@ func Web() {
 		r.Static("static", "theme/static")
 		r.Static("upload", "upload/")
 	}
+
+	// 处理支付回调
+	r.GET("/pay/return", user.Notify)
+	r.POST("/pay/notify", user.Return)
+
 	panelRouter := r.Group("/")
 	{
 		panelRouter.GET("", mibiao.Index)
@@ -65,6 +70,7 @@ func Web() {
 		authUser := api.Group("")
 		{
 			authUser.Use(mygin.Authorize(mygin.AuthOption{NeedUser: true}))
+			authUser.GET("pay", user.Pay)
 			authUser.PUT("user", user.Settings)
 			authUser.GET("offers", panelr.Offers)
 			authUser.PUT("panel", panelr.Edit)

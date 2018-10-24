@@ -14,6 +14,12 @@ type Config struct {
 		Addr   string
 		Domain string
 	}
+	Alipay struct {
+		Prikey string
+		Pubkey string
+		Appid  string
+		Prod   bool
+	}
 	Mail struct {
 		SMTP string `mapstructure:"smtp"`
 		Port int
