@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"git.cm/nb/domain-panel"
 	"git.cm/nb/domain-panel/pkg/mygin"
@@ -97,20 +98,51 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}
+
+	u := c.MustGet(mygin.KUser).(panel.User)
+
+	// 查询会员是否有效
+	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
+		c.String(http.StatusForbidden, "您还不是会员，无法进行此操作")
+		return
+	}
+
+	// 根据会员等级限制米表数量
+	var panelCount int
+	panel.DB.Where("user_id = ?").Find(panel.Panel{}).Count(&panelCount)
+	if u.SuperVIPExpire.After(time.Now()) {
+		// 限制主题
+		if pf.Theme != "offical-superhero" {
+			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
+			return
+		}
+		// 限制数量
+		if panelCount > 5 {
+			c.String(http.StatusForbidden, "您的米表数超过5，无法进行此操作")
+			return
+		}
+	} else {
+		if panelCount > 1 {
+			c.String(http.StatusForbidden, "您的米表数超过1，无法进行此操作，建议您升级会员")
+			return
+		}
+	}
+
 	//如果是修改米表，鉴权
 	var p panel.Panel
-	u := c.MustGet(mygin.KUser).(panel.User)
 	if c.Request.Method == http.MethodPut {
 		if panel.DB.Where("id = ? AND user_id = ?", pf.ID, u.ID).First(&p).Error != nil {
 			c.String(http.StatusForbidden, "米表不存在")
 			return
 		}
 	}
+
 	// 保存logo
 	saveLogo := func(f *multipart.FileHeader, what string) error {
 		ext := f.Filename[strings.LastIndex(f.Filename, ".")+1:]
 		return c.SaveUploadedFile(f, "upload/logo/"+p.SID()+"-"+what+"."+ext)
 	}
+
 	// 检查logo
 	checkLogo := func(name string) (*multipart.FileHeader, error, bool) {
 		f, err := c.FormFile(name)
