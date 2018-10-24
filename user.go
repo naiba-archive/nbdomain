@@ -12,15 +12,16 @@ import (
 //User model
 type User struct {
 	gorm.Model
-	Mail     string `gorm:"type:varchar(50);unique_index"`
-	Password string `json:"-"`
-	IsAdmin  bool
-	Token    string `gorm:"type:varchar(100);unique_index"`
-	Name     string
-	Phone    string
-	QQ       string
-	Weixin   string
-	Expire   time.Time
+	Mail           string `gorm:"type:varchar(50);unique_index"`
+	Password       string `json:"-"`
+	IsAdmin        bool
+	Token          string `gorm:"type:varchar(100);unique_index"`
+	Name           string
+	Phone          string
+	QQ             string
+	Weixin         string
+	GoldVIPExpire  time.Time
+	SuperVIPExpire time.Time
 
 	Domains []Domain `json:",omitempty"`
 	Panels  []Panel  `json:",omitempty"`

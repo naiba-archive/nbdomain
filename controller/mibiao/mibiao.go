@@ -36,8 +36,8 @@ func checkExpire(c *gin.Context) bool {
 		}
 		//会员过期，提示已过期
 		panel.DB.Model(&d).Related(&d.User)
-		if d.User.Expire.Before(time.Now()) {
-			c.String(http.StatusForbidden, "域名停放已过期，请您及时续费。")
+		if d.User.SuperVIPExpire.Before(time.Now()) {
+			c.String(http.StatusForbidden, "您还不是超级会员，无法享用「域名停放」功能。")
 			return false
 		}
 		//会员正常，取米表详情
@@ -47,12 +47,12 @@ func checkExpire(c *gin.Context) bool {
 	}
 	//是米表，检查会员到期
 	panel.DB.Model(&p).Related(&p.User)
-	if p.User.Expire.Before(time.Now()) {
-		c.String(http.StatusForbidden, "域名停放已过期，请您及时续费。")
+	if p.User.GoldVIPExpire.Before(time.Now()) || p.User.SuperVIPExpire.Before(time.Now()) {
+		c.String(http.StatusForbidden, "您还不是会员，无法享用「米表」功能。")
 		return false
 	}
 	if p.Theme == "" {
-		p.Theme = "sbdotsb"
+		p.Theme = "offical-superhero"
 	}
 	c.Set("Panel", p)
 	c.Set("Chinese", strings.Contains(c.Request.Header.Get("accept-language"), "zh"))
@@ -74,7 +74,7 @@ func Allow(c *gin.Context) {
 		return
 	}
 	panel.DB.Model(&p).Related(&p.User)
-	if p.User.Expire.Before(time.Now()) {
+	if p.User.SuperVIPExpire.Before(time.Now()) {
 		c.Status(http.StatusForbidden)
 		return
 	}
