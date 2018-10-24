@@ -72,9 +72,9 @@ func Edit(c *gin.Context) {
 		ID           uint   `form:"id"`
 		Domain       string `form:"domain" binding:"required,min=3,max=63"`
 		Name         string `form:"name_cn" binding:"required,min=1,max=20"`
-		NameEn       string `form:"name_en" binding:"required,min=1,max=20"`
+		NameEn       string `form:"name_en" binding:"required,min=1,max=40"`
 		Desc         string `form:"desc_cn" binding:"required,min=1,max=255"`
-		DescEn       string `form:"desc_en" binding:"required,min=1,max=255"`
+		DescEn       string `form:"desc_en" binding:"required,min=1,max=1000"`
 		Theme        string `form:"theme" binding:"required"`
 		Analysis     string `form:"ga" binding:"max=20"`
 		AnalysisType string `form:"at"`
