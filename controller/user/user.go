@@ -84,8 +84,8 @@ func Pay(c *gin.Context) {
 	var o panel.Order
 	o.UserID = u.ID
 	var p = alipay.AliPayTradePagePay{}
-	p.NotifyURL = panel.CF.Web.Domain + "/pay/notify"
-	p.ReturnURL = panel.CF.Web.Domain + "/pay/return"
+	p.NotifyURL = "https://" + panel.CF.Web.Domain + "/pay/notify"
+	p.ReturnURL = "https://" + panel.CF.Web.Domain + "/pay/return"
 	p.TotalAmount = func() string {
 		if what == "gold" {
 			return "10.00"
