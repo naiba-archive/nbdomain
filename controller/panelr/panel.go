@@ -111,17 +111,18 @@ func Edit(c *gin.Context) {
 	var panelCount int
 	panel.DB.Where("user_id = ?").Find(panel.Panel{}).Count(&panelCount)
 	if u.SuperVIPExpire.After(time.Now()) {
-		// 限制主题
-		if pf.Theme != "offical-superhero" {
-			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
-			return
-		}
 		// 限制数量
 		if panelCount > 5 {
 			c.String(http.StatusForbidden, "您的米表数超过5，无法进行此操作")
 			return
 		}
 	} else {
+		// 限制主题
+		if pf.Theme != "offical-superhero" {
+			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
+			return
+		}
+		// 限制数量
 		if panelCount > 1 {
 			c.String(http.StatusForbidden, "您的米表数超过1，无法进行此操作，建议您升级会员")
 			return
