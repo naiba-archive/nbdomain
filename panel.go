@@ -10,6 +10,13 @@ import (
 var ThemeList = map[string]string{
 	"offical-superhero": "「官方」Superhero",
 	"sbdotsb":           "「烧饼」Doma.in",
+	"longge":            "「龙哥」青山为雪白头",
+}
+
+//OfferThemeList 报价页主题列表
+var OfferThemeList = map[string]string{
+	"offical-superhero": "「官方」Superhero",
+	"sbdotsb":           "「烧饼」Doma.in",
 }
 
 //AnalysisTypes 米表统计类型
@@ -30,6 +37,7 @@ type Panel struct {
 	AnalysisType string
 	Analysis     string
 	Theme        string
+	OfferTheme   string
 
 	User    User     `json:",omitempty"`
 	Cats    []Cat    `json:",omitempty"`

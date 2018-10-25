@@ -51,7 +51,11 @@ func checkExpire(c *gin.Context) bool {
 		c.String(http.StatusForbidden, "您还不是会员，无法享用「米表」功能。")
 		return false
 	}
+	//设置默认主题
 	if p.Theme == "" {
+		p.Theme = "offical-superhero"
+	}
+	if p.OfferTheme == "" {
 		p.Theme = "offical-superhero"
 	}
 	c.Set("Panel", p)
@@ -129,7 +133,7 @@ func Offer(c *gin.Context) {
 		} else {
 			title = d.Domain + " may be for sale - " + p.NameEn
 		}
-		c.HTML(http.StatusOK, p.Theme+"/offer", gin.H{
+		c.HTML(http.StatusOK, p.OfferTheme+"/offer", gin.H{
 			"Static":  "//" + panel.CF.Web.Domain,
 			"Title":   title,
 			"Panel":   p,

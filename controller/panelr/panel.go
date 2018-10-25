@@ -77,6 +77,7 @@ func Edit(c *gin.Context) {
 		Desc         string `form:"desc_cn" binding:"required,min=1,max=255"`
 		DescEn       string `form:"desc_en" binding:"required,min=1,max=1000"`
 		Theme        string `form:"theme" binding:"required"`
+		OfferTheme   string `form:"offer_theme" binding:"required"`
 		Analysis     string `form:"ga" binding:"max=20"`
 		AnalysisType string `form:"at"`
 	}
@@ -117,8 +118,13 @@ func Edit(c *gin.Context) {
 			return
 		}
 	} else {
-		// 限制主题
+		// 限制米表主题
 		if pf.Theme != "offical-superhero" {
+			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
+			return
+		}
+		// 限制Offer主题
+		if pf.OfferTheme != "offical-superhero" {
 			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
 			return
 		}
@@ -179,6 +185,7 @@ func Edit(c *gin.Context) {
 	p.Desc = pf.Desc
 	p.DescEn = pf.DescEn
 	p.Theme = pf.Theme
+	p.OfferTheme = pf.OfferTheme
 	p.Analysis = pf.Analysis
 	p.AnalysisType = pf.AnalysisType
 	if err := panel.DB.Save(&p).Error; err != nil {
