@@ -56,7 +56,7 @@ func checkExpire(c *gin.Context) bool {
 		p.Theme = "offical-superhero"
 	}
 	if p.OfferTheme == "" {
-		p.Theme = "offical-superhero"
+		p.OfferTheme = "offical-superhero"
 	}
 	c.Set("Panel", p)
 	c.Set("Chinese", strings.Contains(c.Request.Header.Get("accept-language"), "zh"))
