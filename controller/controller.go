@@ -75,7 +75,10 @@ func Web() {
 			authUser.GET("offers", panelr.Offers)
 			authUser.PUT("panel", panelr.Edit)
 			authUser.GET("themes", func(c *gin.Context) {
-				c.JSON(http.StatusOK, panel.ThemeList)
+				c.JSON(http.StatusOK, gin.H{
+					"themes":       panel.ThemeList,
+					"offer_themes": panel.OfferThemeList,
+				})
 			})
 			authUser.GET("analysis_types", func(c *gin.Context) {
 				c.JSON(http.StatusOK, panel.AnalysisTypes)
