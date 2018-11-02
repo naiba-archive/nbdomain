@@ -11,6 +11,7 @@ var ThemeList = map[string]string{
 	"offical-superhero": "「官方」Superhero",
 	"sbdotsb":           "「烧饼」Doma.in",
 	"longge":            "「龙哥」青山为雪白头",
+	"bocai":             "「神马」接地气菠菜",
 }
 
 //OfferThemeList 报价页主题列表
