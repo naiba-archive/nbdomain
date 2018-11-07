@@ -59,7 +59,7 @@ func Mail(ctx *gin.Context) {
 		Body: hermes.Body{
 			Name: mf.Mail,
 			Intros: []string{
-				"日落域名资产管理平台，域名投资，我们是认真的。",
+				"日落米表托管，域名投资，我们是认真的。",
 			},
 			Actions: []hermes.Action{
 				{
