@@ -20,9 +20,10 @@ var mailRender = hermes.Hermes{
 	// Theme: new(Default)
 	Product: hermes.Product{
 		// Appears in header & footer of e-mails
-		Name: "日落域名资产管理平台",
-		Link: "https://www.riluo.cn/",
-		Logo: "https://www.riluo.cn/static/offical/images/logo.png",
+		Copyright: "Copyright © 2018 日落米表托管. All rights reserved.",
+		Name:      "日落米表托管",
+		Link:      "https://www.riluo.cn/",
+		Logo:      "https://www.riluo.cn/static/offical/images/logo.png",
 	},
 }
 

@@ -67,7 +67,7 @@ func TmplVars(ctx *gin.Context, data TmplData) gin.H {
 	if len(data.Title) > 0 {
 		all["title"] = data.Title + " - 日落域名资产 riluo.cn"
 	} else {
-		all["title"] = "日落域名资产管理平台 riluo.cn"
+		all["title"] = "日落米表托管 riluo.cn"
 	}
 	all["user"], _ = ctx.Get(KUser)
 	all["chinese"], _ = ctx.Get(KChinese)
