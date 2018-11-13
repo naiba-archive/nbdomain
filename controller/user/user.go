@@ -202,6 +202,8 @@ func Register(ctx *gin.Context) {
 		ctx.String(http.StatusInternalServerError, "服务器错误：密码生成错误。")
 		return
 	}
+	u.GoldVIPExpire = time.Now()
+	u.SuperVIPExpire = u.GoldVIPExpire
 	u.Password = string(bPass)
 	if err := panel.DB.Save(&u).Error; err != nil {
 		log.Println("database error", err.Error())
