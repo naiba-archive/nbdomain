@@ -87,9 +87,11 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "输入数据不符合规范。")
 		return
 	}
-	if _, has := panel.AnalysisTypes[pf.AnalysisType]; !has {
-		c.String(http.StatusForbidden, "米表统计类型不存在")
-		return
+	if pf.AnalysisType != "" {
+		if _, has := panel.AnalysisTypes[pf.AnalysisType]; !has {
+			c.String(http.StatusForbidden, "米表统计类型不存在")
+			return
+		}
 	}
 	if _, has := panel.ThemeList[pf.Theme]; !has {
 		c.String(http.StatusForbidden, "主题不存在")
