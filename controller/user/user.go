@@ -88,9 +88,9 @@ func Pay(c *gin.Context) {
 	p.ReturnURL = "https://" + panel.CF.Web.Domain + "/pay/return"
 	p.TotalAmount = func() string {
 		if what == "gold" {
-			return "10.00"
+			return "5.00"
 		}
-		return "30.00"
+		return "10.00"
 	}()
 	p.Subject = "「" + what + "」会员续费"
 	o.What = what
