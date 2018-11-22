@@ -66,10 +66,10 @@ func checkExpire(c *gin.Context) bool {
 //Allow 米表自动HTTPS
 func Allow(c *gin.Context) {
 	// 禁止局域网之外的访问
-	if c.ClientIP() != "127.0.0.1" {
-		c.Status(http.StatusForbidden)
-		return
-	}
+	// if c.ClientIP() != "127.0.0.1" {
+	// 	c.Status(http.StatusForbidden)
+	// 	return
+	// }
 	domain := c.Query("domain")
 	var p panel.Panel
 	err := panel.DB.Where("domain = ?", domain).First(&p).Error
