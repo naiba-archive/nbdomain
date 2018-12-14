@@ -40,7 +40,7 @@ func Web() {
 		conf.AddAllowHeaders("Authorization")
 		r.Use(cors.New(conf))
 		r.Static("static", "theme/static")
-		r.Static("upload", "data/upload/")
+		r.Static("upload", "data/upload")
 	}
 
 	// 处理支付回调
