@@ -33,13 +33,13 @@ func Web() {
 		"toLower": strings.ToLower,
 	})
 	r.LoadHTMLGlob("theme/template/**/*")
+	r.Static("static", "theme/static")
 	if panel.CF.Debug {
 		conf := cors.DefaultConfig()
 		conf.AllowAllOrigins = true
 		conf.AddAllowMethods("DELETE")
 		conf.AddAllowHeaders("Authorization")
 		r.Use(cors.New(conf))
-		r.Static("static", "theme/static")
 		r.Static("upload", "data/upload")
 	}
 
