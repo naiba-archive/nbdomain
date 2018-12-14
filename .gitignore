@@ -3,5 +3,5 @@ vendor/
 cmd/domain-panel/theme
 cmd/domain-panel/config.yaml
 cmd/domain-panel/domain-panel_*
-cmd/domain-panel/upload/logo/*
+cmd/domain-panel/data/upload/logo/*
 !cmd/domain-panel/upload/logo/.gitkeep
