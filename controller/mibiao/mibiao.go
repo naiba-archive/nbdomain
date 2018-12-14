@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"git.cm/nb/domain-panel"
-	"git.cm/nb/domain-panel/service"
+	"git.cm/naiba/domain-panel"
+	"git.cm/naiba/domain-panel/service"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/idna"

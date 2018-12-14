@@ -45,7 +45,7 @@ var DB *gorm.DB
 
 func init() {
 	//加载配置
-	viper.SetConfigName("config")
+	viper.SetConfigName("data/config")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {

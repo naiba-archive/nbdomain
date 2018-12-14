@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	panel "git.cm/nb/domain-panel"
-	"git.cm/nb/domain-panel/pkg/mygin"
+	panel "git.cm/naiba/domain-panel"
+	"git.cm/naiba/domain-panel/pkg/mygin"
 	"github.com/gin-gonic/gin"
 )
 

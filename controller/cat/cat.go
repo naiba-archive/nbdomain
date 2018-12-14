@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"git.cm/nb/domain-panel"
-	"git.cm/nb/domain-panel/pkg/mygin"
+	"git.cm/naiba/domain-panel"
+	"git.cm/naiba/domain-panel/pkg/mygin"
 
 	"github.com/gin-gonic/gin"
 )

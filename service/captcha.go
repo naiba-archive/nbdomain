@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"git.cm/nb/domain-panel"
+	"git.cm/naiba/domain-panel"
 )
 
 //CaptchaService 验证码服务

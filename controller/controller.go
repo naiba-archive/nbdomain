@@ -5,15 +5,15 @@ import (
 	"net/http"
 	"strings"
 
-	"git.cm/nb/domain-panel"
-	"git.cm/nb/domain-panel/controller/cat"
-	"git.cm/nb/domain-panel/controller/domain"
-	"git.cm/nb/domain-panel/controller/mibiao"
-	"git.cm/nb/domain-panel/controller/panelr"
-	"git.cm/nb/domain-panel/controller/user"
-	"git.cm/nb/domain-panel/controller/verify"
-	"git.cm/nb/domain-panel/controller/whois"
-	"git.cm/nb/domain-panel/pkg/mygin"
+	"git.cm/naiba/domain-panel"
+	"git.cm/naiba/domain-panel/controller/cat"
+	"git.cm/naiba/domain-panel/controller/domain"
+	"git.cm/naiba/domain-panel/controller/mibiao"
+	"git.cm/naiba/domain-panel/controller/panelr"
+	"git.cm/naiba/domain-panel/controller/user"
+	"git.cm/naiba/domain-panel/controller/verify"
+	"git.cm/naiba/domain-panel/controller/whois"
+	"git.cm/naiba/domain-panel/pkg/mygin"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -40,7 +40,7 @@ func Web() {
 		conf.AddAllowHeaders("Authorization")
 		r.Use(cors.New(conf))
 		r.Static("static", "theme/static")
-		r.Static("upload", "upload/")
+		r.Static("upload", "data/upload/")
 	}
 
 	// 处理支付回调

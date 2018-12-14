@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"git.cm/nb/domain-panel"
-	"git.cm/nb/domain-panel/pkg/mygin"
+	"git.cm/naiba/domain-panel"
+	"git.cm/naiba/domain-panel/pkg/mygin"
 
 	"github.com/gin-gonic/gin"
 )
@@ -62,8 +62,8 @@ func Delete(c *gin.Context) {
 		c.String(http.StatusForbidden, "米表不存在")
 		return
 	}
-	os.Remove("upload/logo/" + p.SID() + "-logo.png")
-	os.Remove("upload/logo/" + p.SID() + "-logo_en.png")
+	os.Remove("data/upload/logo/" + p.SID() + "-logo.png")
+	os.Remove("data/upload/logo/" + p.SID() + "-logo_en.png")
 	panel.DB.Delete(&p)
 }
 
@@ -149,7 +149,7 @@ func Edit(c *gin.Context) {
 	// 保存logo
 	saveLogo := func(f *multipart.FileHeader, what string) error {
 		ext := f.Filename[strings.LastIndex(f.Filename, ".")+1:]
-		return c.SaveUploadedFile(f, "upload/logo/"+p.SID()+"-"+what+"."+ext)
+		return c.SaveUploadedFile(f, "data/upload/logo/"+p.SID()+"-"+what+"."+ext)
 	}
 
 	// 检查logo

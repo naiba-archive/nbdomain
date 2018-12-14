@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"time"
 
-	"git.cm/nb/domain-panel"
+	"git.cm/naiba/domain-panel"
 
 	"github.com/matcornic/hermes"
 	"github.com/naiba/com"
 
-	"git.cm/nb/domain-panel/service"
+	"git.cm/naiba/domain-panel/service"
 	"github.com/gin-gonic/gin"
 )
 
