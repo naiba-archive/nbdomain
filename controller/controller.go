@@ -31,6 +31,9 @@ func Web() {
 	r := gin.Default()
 	r.SetFuncMap(template.FuncMap{
 		"toLower": strings.ToLower,
+		"nl2br": func(text string) template.HTML {
+			return template.HTML(strings.Replace(template.HTMLEscapeString(text), "\n", "<br>", -1))
+		},
 	})
 	r.LoadHTMLGlob("theme/template/**/*")
 	r.Static("static", "theme/static")
