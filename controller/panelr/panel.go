@@ -198,7 +198,7 @@ func Edit(c *gin.Context) {
 	}
 	if err != nil {
 		log.Println(err)
-		c.String(http.StatusInternalServerError, "米表域名已有人添加")
+		c.String(http.StatusInternalServerError, err.Error())
 		return
 	}
 	if blogo {
