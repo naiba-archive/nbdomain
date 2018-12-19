@@ -127,7 +127,13 @@ func Settings(c *gin.Context) {
 	u.QQ = lf.QQ
 	u.Phone = lf.Phone
 	u.Name = lf.Name
-	if err := panel.DB.Save(&u).Error; err != nil {
+	var err error
+	if c.Request.Method == http.MethodPost {
+		err = panel.DB.Save(&u).Error
+	} else {
+		err = panel.DB.Model(&u).Update(u).Error
+	}
+	if err != nil {
 		log.Println("database error", err.Error())
 		c.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
 		return

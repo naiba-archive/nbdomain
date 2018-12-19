@@ -56,8 +56,13 @@ func Edit(c *gin.Context) {
 	cat.UserID = u.ID
 	cat.PanelID = p.ID
 	cat.Index = ef.Index
-
-	if err := panel.DB.Save(&cat).Error; err != nil {
+	var err error
+	if c.Request.Method == http.MethodPost {
+		err = panel.DB.Save(&cat).Error
+	} else {
+		err = panel.DB.Model(&cat).Update(cat).Error
+	}
+	if err != nil {
 		log.Println(err)
 		c.String(http.StatusInternalServerError, "服务器错误")
 		return

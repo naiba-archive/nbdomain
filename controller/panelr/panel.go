@@ -190,7 +190,13 @@ func Edit(c *gin.Context) {
 	p.OfferTheme = pf.OfferTheme
 	p.Analysis = pf.Analysis
 	p.AnalysisType = pf.AnalysisType
-	if err := panel.DB.Save(&p).Error; err != nil {
+	var err error
+	if c.Request.Method == http.MethodPost {
+		err = panel.DB.Save(&p).Error
+	} else {
+		err = panel.DB.Model(&p).Update(p).Error
+	}
+	if err != nil {
 		log.Println(err)
 		c.String(http.StatusInternalServerError, "米表域名已有人添加")
 		return

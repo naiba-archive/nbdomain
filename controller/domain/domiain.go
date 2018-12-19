@@ -172,7 +172,13 @@ func Edit(c *gin.Context) {
 	d.Renew = ef.Renew
 	d.Registrar = ef.Registrar
 
-	if err := panel.DB.Save(&d).Error; err != nil {
+	var err error
+	if c.Request.Method == http.MethodPost {
+		err = panel.DB.Save(&d).Error
+	} else {
+		err = panel.DB.Model(&d).Update(d).Error
+	}
+	if err != nil {
 		log.Println(err)
 		c.String(http.StatusInternalServerError, "服务器错误")
 		return
