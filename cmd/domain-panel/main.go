@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"git.cm/naiba/domain-panel"
-	"git.cm/naiba/domain-panel/controller"
+	"github.com/naiba/domain-panel"
+	"github.com/naiba/domain-panel/controller"
 	whois "github.com/likexian/whois-go"
 	parser "github.com/likexian/whois-parser-go"
 )

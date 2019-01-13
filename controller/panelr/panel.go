@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"git.cm/naiba/domain-panel"
-	"git.cm/naiba/domain-panel/pkg/mygin"
+	"github.com/naiba/domain-panel"
+	"github.com/naiba/domain-panel/pkg/mygin"
 
 	"github.com/gin-gonic/gin"
 )

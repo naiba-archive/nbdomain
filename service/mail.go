@@ -3,7 +3,7 @@ package service
 import (
 	"log"
 
-	"git.cm/naiba/domain-panel"
+	"github.com/naiba/domain-panel"
 
 	"github.com/matcornic/hermes"
 	"gopkg.in/gomail.v2"

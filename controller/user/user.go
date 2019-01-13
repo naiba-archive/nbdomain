@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"git.cm/naiba/domain-panel/pkg/mygin"
+	"github.com/naiba/domain-panel/pkg/mygin"
 
-	"git.cm/naiba/domain-panel"
-	"git.cm/naiba/domain-panel/service"
+	"github.com/naiba/domain-panel"
+	"github.com/naiba/domain-panel/service"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"

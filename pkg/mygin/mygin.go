@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	panel "git.cm/naiba/domain-panel"
+	panel "github.com/naiba/domain-panel"
 	"github.com/gin-gonic/gin"
 )
 

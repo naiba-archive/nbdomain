@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"git.cm/naiba/domain-panel/pkg/mygin"
+	"github.com/naiba/domain-panel/pkg/mygin"
 
-	"git.cm/naiba/domain-panel"
+	"github.com/naiba/domain-panel"
 	"github.com/gin-gonic/gin"
 	whois "github.com/likexian/whois-go"
 	parser "github.com/likexian/whois-parser-go"
