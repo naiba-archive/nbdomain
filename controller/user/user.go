@@ -181,7 +181,7 @@ func Oauth2LoginCallback(c *gin.Context) {
 
 // Oauth2Redirect 烧饼社群登录跳转
 func Oauth2Redirect(c *gin.Context) {
-	c.Redirect(http.StatusFound, "http://localhost:1234/#/?code="+c.Query("code")+"&state="+c.Query("state"))
+	c.Redirect(http.StatusFound, "https://"+panel.CF.Web.Domain+"/#/?code="+c.Query("code")+"&state="+c.Query("state"))
 }
 
 //Return 同步回调
