@@ -16,6 +16,8 @@ type User struct {
 	Password       string `json:"-"`
 	IsAdmin        bool
 	Token          *string `gorm:"type:varchar(100);unique_index"`
+	UcenterID      string  `gorm:"unique_index"`
+	UcenterExtra   string  `gorm:"type:varchar(1000);"`
 	Name           string
 	Phone          string
 	QQ             string
@@ -31,7 +33,7 @@ type User struct {
 
 //GenerateToken 生成用户Token
 func (u *User) GenerateToken() error {
-	token := com.MD5(fmt.Sprintf("%d%d%s", u.ID, time.Now().UnixNano(), com.RandomString(10)))
+	token := com.MD5(fmt.Sprintf("%d%d%d%s", u.UcenterID, u.ID, time.Now().UnixNano(), com.RandomString(10)))
 	u.Token = &token
 	return DB.Save(u).Error
 }

@@ -1,17 +1,25 @@
 package user
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/jinzhu/gorm"
+
+	"github.com/naiba/com"
+
+	"golang.org/x/oauth2"
+
 	"github.com/naiba/domain-panel/pkg/mygin"
 
 	"github.com/naiba/domain-panel"
 	"github.com/naiba/domain-panel/service"
-	"golang.org/x/crypto/bcrypt"
 
+	oidc "github.com/coreos/go-oidc"
 	"github.com/gin-gonic/gin"
 	"github.com/smartwalle/alipay"
 )
@@ -58,6 +66,124 @@ func Notify(c *gin.Context) {
 	return
 }
 
+var oidcConfig *oidc.Config
+var config oauth2.Config
+var ctx context.Context
+var verifier *oidc.IDTokenVerifier
+
+func init() {
+	ctx = context.Background()
+	clientID := "1-66hM9Z"
+	clientSecret := "twC7ItQTM31wqjJf"
+
+	provider, err := oidc.NewProvider(ctx, "https://tv.sb")
+	if err != nil {
+		log.Fatal(err)
+	}
+	oidcConfig = &oidc.Config{
+		ClientID: clientID,
+	}
+	verifier = provider.Verifier(oidcConfig)
+	config = oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		Endpoint:     provider.Endpoint(),
+		RedirectURL:  "https://" + panel.CF.Web.Domain + "/hack/oauth2-redirect",
+		Scopes:       []string{oidc.ScopeOpenID, "profile"},
+	}
+}
+
+// Oauth2Login 烧饼社群登录
+func Oauth2Login(c *gin.Context) {
+	state := com.RandomString(7)
+	service.CacheService{}.Instance().Add("st-"+state, 1, time.Minute*5)
+	c.Redirect(http.StatusFound, config.AuthCodeURL(state))
+}
+
+// Oauth2LoginCallback 烧饼社群登录回调
+func Oauth2LoginCallback(c *gin.Context) {
+	_, has := service.CacheService{}.Instance().Get("st-" + c.Query("state"))
+	if !has {
+		c.String(http.StatusBadRequest, "state did not match")
+		return
+	}
+
+	oauth2Token, err := config.Exchange(ctx, c.Query("code"))
+	if err != nil {
+		c.String(http.StatusBadRequest, "Failed to exchange token: "+err.Error())
+		return
+	}
+	rawIDToken, ok := oauth2Token.Extra("id_token").(string)
+	if !ok {
+		c.String(http.StatusInternalServerError, "No id_token field in oauth2 token.")
+		return
+	}
+	idToken, err := verifier.Verify(ctx, rawIDToken)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Failed to verify ID Token: "+err.Error())
+		return
+	}
+
+	oauth2Token.AccessToken = "*REDACTED*"
+
+	resp := struct {
+		OAuth2Token   *oauth2.Token
+		IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
+	}{oauth2Token, new(json.RawMessage)}
+
+	if err := idToken.Claims(&resp.IDTokenClaims); err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	data, err := json.MarshalIndent(resp, "", "    ")
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	var x map[string]map[string]interface{}
+	err = json.Unmarshal(data, &x)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	oid := x["IDTokenClaims"]["sub"]
+	username := x["IDTokenClaims"]["name"]
+	var u panel.User
+	var newUser = false
+	err = panel.DB.Model(panel.User{}).Where("ucenter_id = ?", oid).First(&u).Error
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			c.String(http.StatusForbidden, err.Error())
+			return
+		}
+		newUser = true
+		u = panel.User{
+			UcenterID: oid.(string),
+		}
+	}
+	if u.UcenterExtra != username.(string) {
+		u.UcenterExtra = username.(string)
+	}
+	if newUser {
+		panel.DB.Create(&u)
+		u.GoldVIPExpire = time.Now()
+		u.SuperVIPExpire = u.GoldVIPExpire
+		if u.ID == 1 {
+			u.IsAdmin = true
+		}
+	}
+	if err := u.GenerateToken(); err != nil {
+		c.String(http.StatusInternalServerError, "数据库错误")
+		return
+	}
+	c.JSON(http.StatusOK, u)
+}
+
+// Oauth2Redirect 烧饼社群登录跳转
+func Oauth2Redirect(c *gin.Context) {
+	c.Redirect(http.StatusFound, "http://localhost:1234/#/?code="+c.Query("code")+"&state="+c.Query("state"))
+}
+
 //Return 同步回调
 func Return(c *gin.Context) {
 	nti, err := client.GetTradeNotification(c.Request)
@@ -84,8 +210,8 @@ func Pay(c *gin.Context) {
 	var o panel.Order
 	o.UserID = u.ID
 	var p = alipay.AliPayTradePagePay{}
-	p.NotifyURL = "https://" + panel.CF.Web.Domain + "/pay/notify"
-	p.ReturnURL = "https://" + panel.CF.Web.Domain + "/pay/return"
+	p.NotifyURL = "https://" + panel.CF.Web.Domain + "/hack/pay-notify"
+	p.ReturnURL = "https://" + panel.CF.Web.Domain + "/hack/pay-return"
 	p.TotalAmount = func() string {
 		if what == "gold" {
 			return "5.00"
@@ -139,134 +265,4 @@ func Settings(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, u)
-}
-
-//Login 登录
-func Login(ctx *gin.Context) {
-	type loginForm struct {
-		Mail      string `form:"mail" binding:"required,email"`
-		Password  string `form:"password" binding:"required,min=6"`
-		ReCaptcha string `form:"recaptcha" binding:"required,min=20"`
-	}
-	var lf loginForm
-	if err := ctx.ShouldBind(&lf); err != nil {
-		log.Println(err)
-		ctx.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
-		return
-	}
-	var cs service.CaptchaService
-	if success, host := cs.Verify(lf.ReCaptcha, ctx.ClientIP()); !success || host != panel.CF.Web.Domain {
-		ctx.String(http.StatusForbidden, "验证码不正确")
-		return
-	}
-	var u panel.User
-	if panel.DB.Where("mail = ?", lf.Mail).First(&u).Error != nil {
-		ctx.String(http.StatusForbidden, "用户不存在")
-		return
-	}
-	if bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(lf.Password)) != nil {
-		ctx.String(http.StatusForbidden, "密码不正确")
-		return
-	}
-	if err := u.GenerateToken(); err != nil {
-		log.Println("database error", err.Error())
-		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
-		return
-	}
-	ctx.JSON(http.StatusOK, u)
-}
-
-//Register 注册账号
-func Register(ctx *gin.Context) {
-	type regForm struct {
-		Name     string `form:"name" binding:"required,min=2,max=12"`
-		Mail     string `form:"mail" binding:"required,email"`
-		Password string `form:"password" binding:"required,min=6"`
-		Verify   string `form:"verify" binding:"required,len=5"`
-	}
-	var rf regForm
-	if err := ctx.ShouldBind(&rf); err != nil {
-		log.Println(err)
-		ctx.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
-		return
-	}
-	//校验验证码
-	cacheKey := "v" + "reg" + rf.Mail + rf.Verify
-	var cs service.CacheService
-	if _, has := cs.Instance().Get(cacheKey); !has {
-		ctx.String(http.StatusForbidden, "邮箱验证码不正确")
-		return
-	}
-	cs.Instance().Delete(cacheKey)
-	//用户入库
-	var u panel.User
-	u.Name = rf.Name
-	u.Mail = rf.Mail
-	bPass, err := bcrypt.GenerateFromPassword([]byte(rf.Password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println("password generate", err.Error())
-		ctx.String(http.StatusInternalServerError, "服务器错误：密码生成错误。")
-		return
-	}
-	u.Password = string(bPass)
-
-	u.GoldVIPExpire = time.Now()
-	u.SuperVIPExpire = u.GoldVIPExpire
-
-	if err := panel.DB.Save(&u).Error; err != nil {
-		log.Println("database error", err.Error())
-		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
-		return
-	}
-	if u.ID == 1 {
-		u.IsAdmin = true
-	}
-	if err := u.GenerateToken(); err != nil {
-		log.Println("database error", err.Error())
-		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
-		return
-	}
-	ctx.JSON(http.StatusOK, u)
-}
-
-//ResetPassword 重置密码
-func ResetPassword(ctx *gin.Context) {
-	type resetForm struct {
-		Mail     string `form:"mail" binding:"required,email"`
-		Password string `form:"password" binding:"required,min=6"`
-		Verify   string `form:"verify" binding:"required,len=5"`
-	}
-	var rf resetForm
-	if err := ctx.ShouldBind(&rf); err != nil {
-		log.Println(err)
-		ctx.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
-		return
-	}
-	//校验验证码
-	cacheKey := "v" + "forget" + rf.Mail + rf.Verify
-	var cs service.CacheService
-	if _, has := cs.Instance().Get(cacheKey); !has {
-		ctx.String(http.StatusForbidden, "邮箱验证码不正确")
-		return
-	}
-	cs.Instance().Delete(cacheKey)
-	//用户入库
-	var u panel.User
-	if panel.DB.Where("mail = ?", rf.Mail).First(&u).Error != nil {
-		ctx.String(http.StatusForbidden, "用户不存在")
-		return
-	}
-	bPass, err := bcrypt.GenerateFromPassword([]byte(rf.Password), bcrypt.DefaultCost)
-	if err != nil {
-		log.Println("password generate", err.Error())
-		ctx.String(http.StatusInternalServerError, "服务器错误：密码生成错误。")
-		return
-	}
-	u.Password = string(bPass)
-	if err := u.GenerateToken(); err != nil {
-		log.Println("database error", err.Error())
-		ctx.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
-		return
-	}
-	ctx.JSON(http.StatusOK, u)
 }

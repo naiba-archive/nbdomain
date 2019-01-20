@@ -11,7 +11,6 @@ import (
 	"github.com/naiba/domain-panel/controller/mibiao"
 	"github.com/naiba/domain-panel/controller/panelr"
 	"github.com/naiba/domain-panel/controller/user"
-	"github.com/naiba/domain-panel/controller/verify"
 	"github.com/naiba/domain-panel/controller/whois"
 	"github.com/naiba/domain-panel/pkg/mygin"
 
@@ -47,8 +46,13 @@ func Web() {
 	}
 
 	// 处理支付回调
-	r.GET("/pay/return", user.Notify)
-	r.POST("/pay/notify", user.Return)
+	r.GET("/hack/pay-return", user.Notify)
+	r.POST("/hack/pay-notify", user.Return)
+
+	// 第三方登录
+	r.GET("/hack/oauth2-login", user.Oauth2Login)
+	r.GET("/hack/oauth2-callback", user.Oauth2LoginCallback)
+	r.GET("/hack/oauth2-redirect", user.Oauth2Redirect)
 
 	panelRouter := r.Group("/")
 	{
@@ -62,14 +66,6 @@ func Web() {
 	}
 	api := r.Group("/api")
 	{
-		unAuth := api.Group("")
-		{
-			unAuth.Use(mygin.Authorize(mygin.AuthOption{NeedGhost: true}))
-			unAuth.POST("send_verify", verify.Mail)
-			unAuth.POST("reg", user.Register)
-			unAuth.POST("login", user.Login)
-			unAuth.POST("reset_password", user.ResetPassword)
-		}
 		authUser := api.Group("")
 		{
 			authUser.Use(mygin.Authorize(mygin.AuthOption{NeedUser: true}))
