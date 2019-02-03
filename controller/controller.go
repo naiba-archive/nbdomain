@@ -44,6 +44,9 @@ func Web() {
 		r.Use(cors.New(conf))
 		r.Static("upload", "data/upload")
 	}
+	r.NoRoute(func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "http://"+c.Request.URL.Hostname())
+	})
 
 	// 处理支付回调
 	r.GET("/hack/pay-return", user.Notify)
