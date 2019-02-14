@@ -124,8 +124,6 @@ func Oauth2LoginCallback(c *gin.Context) {
 		return
 	}
 
-	oauth2Token.AccessToken = "*REDACTED*"
-
 	resp := struct {
 		OAuth2Token   *oauth2.Token
 		IDTokenClaims *json.RawMessage // ID Token payload is just JSON.
