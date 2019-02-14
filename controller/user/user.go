@@ -76,7 +76,7 @@ func init() {
 	clientID := "1-66hM9Z"
 	clientSecret := "twC7ItQTM31wqjJf"
 
-	provider, err := oidc.NewProvider(ctx, "https://tv.sb")
+	provider, err := oidc.NewProvider(ctx, "https://space.mentuo.com")
 	if err != nil {
 		log.Fatal(err)
 	}
