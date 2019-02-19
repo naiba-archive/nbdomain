@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +21,30 @@ func Offers(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(panel.User)
 	panel.DB.Model(&u).Related(&u.Offers)
 	c.JSON(http.StatusOK, u.Offers)
+}
+
+//Export 导出米表
+func Export(c *gin.Context) {
+	u := c.MustGet(mygin.KUser).(panel.User)
+	var p panel.Panel
+	if panel.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
+		c.String(http.StatusForbidden, "米表不存在")
+		return
+	}
+	panel.DB.Model(&p).Related(&p.Cats)
+	var txt = make([]byte, 0)
+	for i := 0; i < len(p.Cats); i++ {
+		panel.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
+		txt = append(txt, []byte("#"+p.Cats[i].Name+","+p.Cats[i].NameEn+"\n")...)
+		for j := 0; j < len(p.Cats[i].Domains); j++ {
+			txt = append(txt, []byte(p.Cats[i].Domains[j].Domain+
+				","+strconv.Itoa(p.Cats[i].Domains[j].Cost)+
+				","+p.Cats[i].Domains[j].Buy.Format("2006-01-02")+
+				","+strconv.Itoa(p.Cats[i].Domains[j].Renew)+
+				","+p.Cats[i].Domains[j].Desc+"\n")...)
+		}
+	}
+	c.String(http.StatusOK, string(txt))
 }
 
 //ListCats 米表分类列表

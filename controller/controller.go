@@ -88,6 +88,7 @@ func Web() {
 			authUser.DELETE("panel/:id", panelr.Delete)
 			authUser.GET("panel/:id/cats", panelr.ListCats)
 			authUser.GET("panel/:id/domains", panelr.ListDomains)
+			authUser.GET("panel/:id/export", panelr.Export)
 			authUser.POST("panel", panelr.Edit)
 			authUser.DELETE("cat/:id", cat.Delete)
 			authUser.PUT("cat", cat.Edit)
