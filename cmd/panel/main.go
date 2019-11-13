@@ -4,20 +4,21 @@ import (
 	"errors"
 	"time"
 
-	"github.com/naiba/nbdomain"
-	"github.com/naiba/nbdomain/controller"
 	whois "github.com/likexian/whois-go"
 	parser "github.com/likexian/whois-parser-go"
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/controller"
+	"github.com/naiba/nbdomain/model"
 )
 
 func init() {
 	nbdomain.DB.AutoMigrate(
-		nbdomain.User{},
-		nbdomain.Panel{},
-		nbdomain.Cat{},
-		nbdomain.Domain{},
-		nbdomain.Offer{},
-		nbdomain.Order{},
+		model.User{},
+		model.Panel{},
+		model.Cat{},
+		model.Domain{},
+		model.Offer{},
+		model.Order{},
 	)
 }
 
@@ -28,7 +29,7 @@ func main() {
 }
 
 func updateWhois() {
-	var domains []nbdomain.Domain
+	var domains []model.Domain
 	for {
 		nbdomain.DB.Where("whois_update is NULL or DATEDIFF(now(),whois_update)>7").Find(&domains)
 		for _, domain := range domains {
@@ -39,12 +40,12 @@ func updateWhois() {
 				var parsed parser.WhoisInfo
 				parsed, err = parser.Parse(result)
 				if err == nil {
-					create, _ = parseTime(parsed.Registrar.CreatedDate)
-					expire, _ = parseTime(parsed.Registrar.ExpirationDate)
-					register = parsed.Registrar.RegistrarName
+					create, _ = parseTime(parsed.Domain.CreatedDate)
+					expire, _ = parseTime(parsed.Domain.ExpirationDate)
+					register = parsed.Registrar.Name
 				}
 			}
-			nbdomain.DB.Model(&domain).UpdateColumns(nbdomain.Domain{
+			nbdomain.DB.Model(&domain).UpdateColumns(model.Domain{
 				Registrar:   register,
 				Create:      create,
 				Expire:      expire,

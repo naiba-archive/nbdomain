@@ -5,17 +5,18 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+
 	"github.com/naiba/nbdomain"
 	"github.com/naiba/nbdomain/controller/cat"
 	"github.com/naiba/nbdomain/controller/domain"
 	"github.com/naiba/nbdomain/controller/mibiao"
-	"github.com/naiba/nbdomain/controller/panelr"
+	"github.com/naiba/nbdomain/controller/panel"
 	"github.com/naiba/nbdomain/controller/user"
 	"github.com/naiba/nbdomain/controller/whois"
+	"github.com/naiba/nbdomain/model"
 	"github.com/naiba/nbdomain/pkg/mygin"
-
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
 )
 
 //Web start
@@ -48,15 +49,6 @@ func Web() {
 		c.Redirect(http.StatusFound, "http://"+c.Request.URL.Hostname())
 	})
 
-	// 处理支付回调
-	r.GET("/hack/pay-return", user.Notify)
-	r.POST("/hack/pay-notify", user.Return)
-
-	// 第三方登录
-	r.GET("/hack/oauth2-login", user.Oauth2Login)
-	r.GET("/hack/oauth2-callback", user.Oauth2LoginCallback)
-	r.GET("/hack/oauth2-redirect", user.Oauth2Redirect)
-
 	panelRouter := r.Group("/")
 	{
 		panelRouter.GET("", mibiao.Index)
@@ -72,28 +64,27 @@ func Web() {
 		authUser := api.Group("")
 		{
 			authUser.Use(mygin.Authorize(mygin.AuthOption{NeedUser: true}))
-			authUser.GET("pay", user.Pay)
 			authUser.PUT("user", user.Settings)
-			authUser.GET("offers", panelr.Offers)
-			authUser.PUT("panel", panelr.Edit)
+			authUser.GET("offers", panel.Offers)
+			authUser.PUT("panel", panel.Edit)
 			authUser.GET("themes", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
-					"themes":       nbdomain.ThemeList,
-					"offer_themes": nbdomain.OfferThemeList,
+					"themes":       model.ThemeList,
+					"offer_themes": model.OfferThemeList,
 				})
 			})
 			authUser.GET("analysis_types", func(c *gin.Context) {
-				c.JSON(http.StatusOK, nbdomain.AnalysisTypes)
+				c.JSON(http.StatusOK, model.AnalysisTypes)
 			})
-			authUser.DELETE("panel/:id", panelr.Delete)
-			authUser.GET("panel/:id/cats", panelr.ListCats)
-			authUser.GET("panel/:id/domains", panelr.ListDomains)
-			authUser.GET("panel/:id/export", panelr.Export)
-			authUser.POST("panel", panelr.Edit)
+			authUser.DELETE("panel/:id", panel.Delete)
+			authUser.GET("panel/:id/cats", panel.ListCats)
+			authUser.GET("panel/:id/domains", panel.ListDomains)
+			authUser.GET("panel/:id/export", panel.Export)
+			authUser.POST("panel", panel.Edit)
 			authUser.DELETE("cat/:id", cat.Delete)
 			authUser.PUT("cat", cat.Edit)
 			authUser.POST("cat", cat.Edit)
-			authUser.GET("panels", panelr.List)
+			authUser.GET("panels", panel.List)
 			authUser.POST("batch", domain.Batch)
 			authUser.POST("domain", domain.Edit)
 			authUser.PUT("domain", domain.Edit)

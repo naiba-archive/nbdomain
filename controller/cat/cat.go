@@ -4,22 +4,23 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/naiba/nbdomain"
-	"github.com/naiba/nbdomain/pkg/mygin"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/model"
+	"github.com/naiba/nbdomain/pkg/mygin"
 )
 
 //Delete 删除分类
 func Delete(c *gin.Context) {
 	id := c.Param("id")
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var cat nbdomain.Cat
+	u := c.MustGet(mygin.KUser).(model.User)
+	var cat model.Cat
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, id).First(&cat).Error != nil {
 		c.String(http.StatusForbidden, "分类不存在。")
 		return
 	}
-	nbdomain.DB.Where("cat_id = ?", id).Delete(&nbdomain.Domain{})
+	nbdomain.DB.Where("cat_id = ?", id).Delete(&model.Domain{})
 	nbdomain.DB.Delete(&cat)
 }
 
@@ -38,13 +39,13 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "输入数据不符合规范。")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var p nbdomain.Panel
+	u := c.MustGet(mygin.KUser).(model.User)
+	var p model.Panel
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.PanelID).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在。")
 		return
 	}
-	var cat nbdomain.Cat
+	var cat model.Cat
 	if ef.ID != 0 {
 		if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.ID).First(&cat).Error != nil {
 			c.String(http.StatusForbidden, "分类不存在。")
