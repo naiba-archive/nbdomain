@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/model"
 	"github.com/naiba/nbdomain/service"
 
 	"github.com/gin-gonic/gin"
@@ -23,11 +24,11 @@ func checkExpire(c *gin.Context) bool {
 			return false
 		}
 	}
-	var p nbdomain.Panel
+	var p model.Panel
 	err = nbdomain.DB.Where("domain = ?", domain).First(&p).Error
 	if err != nil {
 		//不是米表，试试域名
-		var d nbdomain.Domain
+		var d model.Domain
 		err = nbdomain.DB.Where("domain = ?", domain).First(&d).Error
 		//未找到域名，跳转平台首页
 		if err != nil {
@@ -42,7 +43,7 @@ func checkExpire(c *gin.Context) bool {
 		}
 		//会员正常，取米表详情
 		nbdomain.DB.Model(&d).Related(&d.Panel)
-		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.nbdomain.Domain+"/offer/"+domain)
+		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.Domain+"/offer/"+domain)
 		return false
 	}
 	//是米表，检查会员到期
@@ -71,7 +72,7 @@ func Allow(c *gin.Context) {
 	// 	return
 	// }
 	domain := c.Query("domain")
-	var p nbdomain.Panel
+	var p model.Panel
 	err := nbdomain.DB.Where("domain = ?", domain).First(&p).Error
 	if err != nil {
 		c.Status(http.StatusForbidden)
@@ -89,7 +90,7 @@ func Index(c *gin.Context) {
 	if !checkExpire(c) {
 		return
 	}
-	p := c.MustGet("Panel").(nbdomain.Panel)
+	p := c.MustGet("Panel").(model.Panel)
 	nbdomain.DB.Model(&p).Order("index").Association("cats").Find(&p.Cats)
 	for i := 0; i < len(p.Cats); i++ {
 		nbdomain.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
@@ -114,8 +115,8 @@ func Offer(c *gin.Context) {
 	if !checkExpire(c) {
 		return
 	}
-	p := c.MustGet("Panel").(nbdomain.Panel)
-	var d nbdomain.Domain
+	p := c.MustGet("Panel").(model.Panel)
+	var d model.Domain
 	if nbdomain.DB.Where("domain = ?", c.Param("domain")).First(&d).Error != nil {
 		if c.Request.Method == http.MethodGet {
 			c.Redirect(http.StatusTemporaryRedirect, "https://"+p.Domain)
@@ -160,7 +161,7 @@ func Offer(c *gin.Context) {
 			c.String(http.StatusForbidden, "ReCaptcha验证未通过。")
 			return
 		}
-		var o nbdomain.Offer
+		var o model.Offer
 		o.Amount = of.Amount
 		o.Currency = of.Currency
 		o.Domain = c.Param("domain")

@@ -1,4 +1,4 @@
-package panel
+package model
 
 //Config 全局配置
 type Config struct {

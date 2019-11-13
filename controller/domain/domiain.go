@@ -6,16 +6,18 @@ import (
 	"strings"
 	"time"
 
-	panel "github.com/naiba/nbdomain"
-	"github.com/naiba/nbdomain/pkg/mygin"
 	"github.com/gin-gonic/gin"
+
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/model"
+	"github.com/naiba/nbdomain/pkg/mygin"
 )
 
 //Delete 删除域名
 func Delete(c *gin.Context) {
 	id := c.Param("id")
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var d nbdomain.Domain
+	u := c.MustGet(mygin.KUser).(model.User)
+	var d model.Domain
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, id).First(&d).Error != nil {
 		c.String(http.StatusForbidden, "域名不存在。")
 		return
@@ -53,15 +55,15 @@ func Batch(c *gin.Context) {
 			}
 		}
 	}
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var p nbdomain.Panel
+	u := c.MustGet(mygin.KUser).(model.User)
+	var p model.Panel
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在。")
 		return
 	}
-	addedDomains := make([]nbdomain.Domain, 0)
+	addedDomains := make([]model.Domain, 0)
 	for _, catForm := range bf.Cats {
-		var cat nbdomain.Cat
+		var cat model.Cat
 		if nbdomain.DB.Where("name = ? AND user_id = ?", strings.TrimSpace(catForm.Name), u.ID).First(&cat).Error != nil {
 			cat.Name = catForm.Name
 			cat.NameEn = catForm.NameEn
@@ -73,7 +75,7 @@ func Batch(c *gin.Context) {
 			}
 		}
 		for _, domainForm := range catForm.Domains {
-			var domain nbdomain.Domain
+			var domain model.Domain
 			if nbdomain.DB.Where("domain = ?", domainForm.Domain).First(&domain).Error == nil {
 				continue
 			}
@@ -120,7 +122,7 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	u := c.MustGet(mygin.KUser).(model.User)
 
 	// 查询会员是否有效
 	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
@@ -130,7 +132,7 @@ func Edit(c *gin.Context) {
 
 	// 根据会员等级限制域名数量
 	var domainCount int
-	nbdomain.DB.Where("user_id = ?").Find(nbdomain.Domain{}).Count(&domainCount)
+	nbdomain.DB.Where("user_id = ?").Find(model.Domain{}).Count(&domainCount)
 	if u.SuperVIPExpire.After(time.Now()) {
 		if domainCount > 1000 {
 			c.String(http.StatusForbidden, "您的域名数超过1000，无法进行此操作")
@@ -143,13 +145,13 @@ func Edit(c *gin.Context) {
 		}
 	}
 
-	var cat nbdomain.Cat
+	var cat model.Cat
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.CatID).First(&cat).Error != nil {
 		c.String(http.StatusForbidden, "分类不存在。")
 		return
 	}
 
-	var d nbdomain.Domain
+	var d model.Domain
 	if ef.ID != 0 {
 		if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.ID).First(&d).Error != nil {
 			c.String(http.StatusForbidden, "域名不存在。")

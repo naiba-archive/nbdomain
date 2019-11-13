@@ -3,31 +3,25 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/jinzhu/gorm"
-
-	"github.com/naiba/com"
-
-	"golang.org/x/oauth2"
-
-	"github.com/naiba/nbdomain/pkg/mygin"
-
-	"github.com/naiba/nbdomain"
-	"github.com/naiba/nbdomain/service"
-
 	oidc "github.com/coreos/go-oidc"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/smartwalle/alipay"
+	"golang.org/x/oauth2"
+
+	"github.com/naiba/com"
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/model"
+	"github.com/naiba/nbdomain/pkg/mygin"
+	"github.com/naiba/nbdomain/service"
 )
 
-var client = alipay.New(nbdomain.CF.Alipay.Appid, "", nbdomain.CF.Alipay.Pubkey, nbdomain.CF.Alipay.Prikey, nbdomain.CF.Alipay.Prod)
-
 func procNotify(nti *alipay.TradeNotification) error {
-	var o nbdomain.Order
+	var o model.Order
 	if err := nbdomain.DB.Where("id = ?", nti.OutTradeNo).First(&o).Error; err != nil {
 		return err
 	}
@@ -49,21 +43,6 @@ func procNotify(nti *alipay.TradeNotification) error {
 		return nbdomain.DB.Save(&o.User).Error
 	}
 	return nil
-}
-
-//Notify 异步回调
-func Notify(c *gin.Context) {
-	nti, err := client.GetTradeNotification(c.Request)
-	if err != nil {
-		c.String(http.StatusForbidden, "数据校验失败")
-		return
-	}
-	if err = procNotify(nti); err == nil {
-		c.String(http.StatusOK, "success")
-		return
-	}
-	c.String(http.StatusInternalServerError, err.Error())
-	return
 }
 
 var oidcConfig *oidc.Config
@@ -146,16 +125,16 @@ func Oauth2LoginCallback(c *gin.Context) {
 	}
 	oid := x["IDTokenClaims"]["sub"]
 	username := x["IDTokenClaims"]["name"]
-	var u nbdomain.User
+	var u model.User
 	var newUser = false
-	err = nbdomain.DB.Model(nbdomain.User{}).Where("ucenter_id = ?", oid).First(&u).Error
+	err = nbdomain.DB.Model(model.User{}).Where("ucenter_id = ?", oid).First(&u).Error
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {
 			c.String(http.StatusForbidden, err.Error())
 			return
 		}
 		newUser = true
-		u = nbdomain.User{
+		u = model.User{
 			UcenterID: oid.(string),
 		}
 	}
@@ -170,66 +149,11 @@ func Oauth2LoginCallback(c *gin.Context) {
 			u.IsAdmin = true
 		}
 	}
-	if err := u.GenerateToken(); err != nil {
+	if err := u.GenerateToken(nbdomain.DB); err != nil {
 		c.String(http.StatusInternalServerError, "数据库错误")
 		return
 	}
 	c.JSON(http.StatusOK, u)
-}
-
-// Oauth2Redirect 烧饼社群登录跳转
-func Oauth2Redirect(c *gin.Context) {
-	c.Redirect(http.StatusFound, "https://"+nbdomain.CF.Web.Domain+"/#/?code="+c.Query("code")+"&state="+c.Query("state"))
-}
-
-//Return 同步回调
-func Return(c *gin.Context) {
-	nti, err := client.GetTradeNotification(c.Request)
-	if err != nil {
-		c.String(http.StatusForbidden, "数据校验失败")
-		return
-	}
-	if err = procNotify(nti); err == nil {
-		c.String(http.StatusOK, "续费成功，请重新登录")
-		return
-	}
-	c.String(http.StatusInternalServerError, err.Error())
-	return
-}
-
-//Pay 用户支付
-func Pay(c *gin.Context) {
-	what := c.Query("vip")
-	if what != "gold" && what != "super" {
-		c.String(http.StatusForbidden, what+"是什么会员？？")
-		return
-	}
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var o nbdomain.Order
-	o.UserID = u.ID
-	var p = alipay.AliPayTradePagePay{}
-	p.NotifyURL = "https://" + nbdomain.CF.Web.Domain + "/hack/pay-notify"
-	p.ReturnURL = "https://" + nbdomain.CF.Web.Domain + "/hack/pay-return"
-	p.TotalAmount = func() string {
-		if what == "gold" {
-			return "5.00"
-		}
-		return "10.00"
-	}()
-	p.Subject = "「" + what + "」会员续费"
-	o.What = what
-	if nbdomain.DB.Save(&o).Error != nil {
-		c.String(http.StatusInternalServerError, "服务器错误，订单入库")
-		return
-	}
-	p.OutTradeNo = fmt.Sprintf("%d", o.ID)
-	var url, err = client.TradePagePay(p)
-	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
-		return
-	}
-	var payURL = url.String()
-	c.Redirect(http.StatusFound, payURL)
 }
 
 //Settings 个人设置
@@ -246,7 +170,7 @@ func Settings(c *gin.Context) {
 		c.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	u := c.MustGet(mygin.KUser).(model.User)
 	u.Weixin = lf.Weixin
 	u.QQ = lf.QQ
 	u.Phone = lf.Phone

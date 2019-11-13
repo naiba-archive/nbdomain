@@ -1,4 +1,4 @@
-package panelr
+package panel
 
 import (
 	"errors"
@@ -10,23 +10,24 @@ import (
 	"strings"
 	"time"
 
-	"github.com/naiba/nbdomain"
-	"github.com/naiba/nbdomain/pkg/mygin"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/model"
+	"github.com/naiba/nbdomain/pkg/mygin"
 )
 
 //Offers 报价列表
 func Offers(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	u := c.MustGet(mygin.KUser).(model.User)
 	nbdomain.DB.Model(&u).Related(&u.Offers)
 	c.JSON(http.StatusOK, u.Offers)
 }
 
 //Export 导出米表
 func Export(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var p nbdomain.Panel
+	u := c.MustGet(mygin.KUser).(model.User)
+	var p model.Panel
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在")
 		return
@@ -49,8 +50,8 @@ func Export(c *gin.Context) {
 
 //ListCats 米表分类列表
 func ListCats(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var p nbdomain.Panel
+	u := c.MustGet(mygin.KUser).(model.User)
+	var p model.Panel
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在")
 		return
@@ -61,8 +62,8 @@ func ListCats(c *gin.Context) {
 
 //ListDomains 米表域名列表
 func ListDomains(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
-	var p nbdomain.Panel
+	u := c.MustGet(mygin.KUser).(model.User)
+	var p model.Panel
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在")
 		return
@@ -73,7 +74,7 @@ func ListDomains(c *gin.Context) {
 
 //List 米表列表
 func List(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	u := c.MustGet(mygin.KUser).(model.User)
 	nbdomain.DB.Model(&u).Related(&u.Panels)
 	c.JSON(http.StatusOK, u.Panels)
 }
@@ -81,8 +82,8 @@ func List(c *gin.Context) {
 //Delete 删除米表
 func Delete(c *gin.Context) {
 	id := c.Param("id")
-	var p nbdomain.Panel
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	var p model.Panel
+	u := c.MustGet(mygin.KUser).(model.User)
 	if nbdomain.DB.Where("id = ? AND user_id = ?", id, u.ID).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在")
 		return
@@ -113,12 +114,12 @@ func Edit(c *gin.Context) {
 		return
 	}
 	if pf.AnalysisType != "" {
-		if _, has := nbdomain.AnalysisTypes[pf.AnalysisType]; !has {
+		if _, has := model.AnalysisTypes[pf.AnalysisType]; !has {
 			c.String(http.StatusForbidden, "米表统计类型不存在")
 			return
 		}
 	}
-	if _, has := nbdomain.ThemeList[pf.Theme]; !has {
+	if _, has := model.ThemeList[pf.Theme]; !has {
 		c.String(http.StatusForbidden, "主题不存在")
 		return
 	}
@@ -127,7 +128,7 @@ func Edit(c *gin.Context) {
 		return
 	}
 
-	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	u := c.MustGet(mygin.KUser).(model.User)
 
 	// 查询会员是否有效
 	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
@@ -137,7 +138,7 @@ func Edit(c *gin.Context) {
 
 	// 根据会员等级限制米表数量
 	var panelCount int
-	nbdomain.DB.Where("user_id = ?").Find(nbdomain.Panel{}).Count(&panelCount)
+	nbdomain.DB.Where("user_id = ?").Find(model.Panel{}).Count(&panelCount)
 	if u.SuperVIPExpire.After(time.Now()) {
 		// 限制数量
 		if panelCount > 5 {
@@ -163,7 +164,7 @@ func Edit(c *gin.Context) {
 	}
 
 	//如果是修改米表，鉴权
-	var p nbdomain.Panel
+	var p model.Panel
 	if c.Request.Method == http.MethodPut {
 		if nbdomain.DB.Where("id = ? AND user_id = ?", pf.ID, u.ID).First(&p).Error != nil {
 			c.String(http.StatusForbidden, "米表不存在")

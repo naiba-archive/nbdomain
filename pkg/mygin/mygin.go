@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/model"
 )
 
 //KChinese 语言
@@ -24,7 +26,7 @@ type AuthOption struct {
 //Authorize 鉴权
 func Authorize(o AuthOption) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var u nbdomain.User
+		var u model.User
 		token := ctx.Request.Header.Get("Authorization")
 		if len(token) != 32 {
 			token = ctx.Query("Authorization")
