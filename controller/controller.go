@@ -19,7 +19,7 @@ import (
 	"github.com/naiba/nbdomain/pkg/mygin"
 )
 
-//Web start
+// Web start
 func Web() {
 	var mode string
 	if nbdomain.CF.Debug {
