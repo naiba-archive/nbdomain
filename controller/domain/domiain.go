@@ -6,21 +6,21 @@ import (
 	"strings"
 	"time"
 
-	panel "github.com/naiba/domain-panel"
-	"github.com/naiba/domain-panel/pkg/mygin"
+	panel "github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/pkg/mygin"
 	"github.com/gin-gonic/gin"
 )
 
 //Delete 删除域名
 func Delete(c *gin.Context) {
 	id := c.Param("id")
-	u := c.MustGet(mygin.KUser).(panel.User)
-	var d panel.Domain
-	if panel.DB.Where("user_id = ? AND id = ?", u.ID, id).First(&d).Error != nil {
+	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	var d nbdomain.Domain
+	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, id).First(&d).Error != nil {
 		c.String(http.StatusForbidden, "域名不存在。")
 		return
 	}
-	panel.DB.Delete(&d)
+	nbdomain.DB.Delete(&d)
 }
 
 //Batch 批量导入域名
@@ -53,28 +53,28 @@ func Batch(c *gin.Context) {
 			}
 		}
 	}
-	u := c.MustGet(mygin.KUser).(panel.User)
-	var p panel.Panel
-	if panel.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
+	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	var p nbdomain.Panel
+	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
 		c.String(http.StatusForbidden, "米表不存在。")
 		return
 	}
-	addedDomains := make([]panel.Domain, 0)
+	addedDomains := make([]nbdomain.Domain, 0)
 	for _, catForm := range bf.Cats {
-		var cat panel.Cat
-		if panel.DB.Where("name = ? AND user_id = ?", strings.TrimSpace(catForm.Name), u.ID).First(&cat).Error != nil {
+		var cat nbdomain.Cat
+		if nbdomain.DB.Where("name = ? AND user_id = ?", strings.TrimSpace(catForm.Name), u.ID).First(&cat).Error != nil {
 			cat.Name = catForm.Name
 			cat.NameEn = catForm.NameEn
 			cat.UserID = u.ID
 			cat.PanelID = p.ID
-			if panel.DB.Save(&cat).Error != nil {
+			if nbdomain.DB.Save(&cat).Error != nil {
 				c.String(http.StatusInternalServerError, "数据库错误，联系管理员")
 				return
 			}
 		}
 		for _, domainForm := range catForm.Domains {
-			var domain panel.Domain
-			if panel.DB.Where("domain = ?", domainForm.Domain).First(&domain).Error == nil {
+			var domain nbdomain.Domain
+			if nbdomain.DB.Where("domain = ?", domainForm.Domain).First(&domain).Error == nil {
 				continue
 			}
 			domain.UserID = u.ID
@@ -85,7 +85,7 @@ func Batch(c *gin.Context) {
 			domain.Renew = domainForm.Renew
 			domain.Domain = domainForm.Domain
 			domain.Desc = domainForm.Desc
-			if panel.DB.Save(&domain).Error != nil {
+			if nbdomain.DB.Save(&domain).Error != nil {
 				c.String(http.StatusInternalServerError, "数据库错误，联系管理员")
 				return
 			}
@@ -120,7 +120,7 @@ func Edit(c *gin.Context) {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(panel.User)
+	u := c.MustGet(mygin.KUser).(nbdomain.User)
 
 	// 查询会员是否有效
 	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
@@ -130,7 +130,7 @@ func Edit(c *gin.Context) {
 
 	// 根据会员等级限制域名数量
 	var domainCount int
-	panel.DB.Where("user_id = ?").Find(panel.Domain{}).Count(&domainCount)
+	nbdomain.DB.Where("user_id = ?").Find(nbdomain.Domain{}).Count(&domainCount)
 	if u.SuperVIPExpire.After(time.Now()) {
 		if domainCount > 1000 {
 			c.String(http.StatusForbidden, "您的域名数超过1000，无法进行此操作")
@@ -143,15 +143,15 @@ func Edit(c *gin.Context) {
 		}
 	}
 
-	var cat panel.Cat
-	if panel.DB.Where("user_id = ? AND id = ?", u.ID, ef.CatID).First(&cat).Error != nil {
+	var cat nbdomain.Cat
+	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.CatID).First(&cat).Error != nil {
 		c.String(http.StatusForbidden, "分类不存在。")
 		return
 	}
 
-	var d panel.Domain
+	var d nbdomain.Domain
 	if ef.ID != 0 {
-		if panel.DB.Where("user_id = ? AND id = ?", u.ID, ef.ID).First(&d).Error != nil {
+		if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.ID).First(&d).Error != nil {
 			c.String(http.StatusForbidden, "域名不存在。")
 			return
 		}
@@ -174,9 +174,9 @@ func Edit(c *gin.Context) {
 
 	var err error
 	if c.Request.Method == http.MethodPost {
-		err = panel.DB.Save(&d).Error
+		err = nbdomain.DB.Save(&d).Error
 	} else {
-		err = panel.DB.Model(&d).Update(d).Error
+		err = nbdomain.DB.Model(&d).Update(d).Error
 	}
 	if err != nil {
 		log.Println(err)

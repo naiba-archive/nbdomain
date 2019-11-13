@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/naiba/domain-panel"
+	"github.com/naiba/nbdomain"
 )
 
 //CaptchaService 验证码服务
@@ -21,7 +21,7 @@ type recaptchaResp struct {
 func (cs CaptchaService) Verify(gresp, ip string) (flag bool, host string) {
 	resp, err := http.Post("https://www.recaptcha.net/recaptcha/api/siteverify",
 		"application/x-www-form-urlencoded",
-		strings.NewReader("secret="+panel.CF.ReCaptcha+"&response="+gresp+"&remoteip="+ip))
+		strings.NewReader("secret="+nbdomain.CF.ReCaptcha+"&response="+gresp+"&remoteip="+ip))
 	if err != nil {
 		return
 	}

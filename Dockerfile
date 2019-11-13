@@ -1,7 +1,7 @@
 FROM golang:alpine AS binarybuilder
 # Install build deps
 RUN apk --no-cache --no-progress add --virtual build-deps build-base git linux-pam-dev
-WORKDIR /go/src/github.com/naiba/domain-panel/
+WORKDIR /go/src/github.com/naiba/nbdomain/
 COPY . .
 RUN cd cmd/domain-panel \
     && go build -ldflags="-s -w"
@@ -14,7 +14,7 @@ RUN echo http://dl-2.alpinelinux.org/alpine/edge/community/ >> /etc/apk/reposito
 # Copy binary to container
 WORKDIR /data
 COPY cmd/domain-panel/theme ./theme
-COPY --from=binarybuilder /go/src/github.com/naiba/domain-panel/cmd/domain-panel/domain-panel ./domain-panel
+COPY --from=binarybuilder /go/src/github.com/naiba/nbdomain/cmd/domain-panel/domain-panel ./domain-panel
 
 # Configure Docker Container
 VOLUME ["/data/data"]

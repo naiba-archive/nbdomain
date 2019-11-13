@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/naiba/domain-panel"
-	"github.com/naiba/domain-panel/service"
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/service"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/idna"
@@ -19,34 +19,34 @@ func checkExpire(c *gin.Context) bool {
 	if strings.Contains(domain, "xn--") {
 		domain, err = idna.ToUnicode(domain)
 		if err != nil {
-			c.Redirect(http.StatusTemporaryRedirect, "https://"+panel.CF.Web.Domain)
+			c.Redirect(http.StatusTemporaryRedirect, "https://"+nbdomain.CF.Web.Domain)
 			return false
 		}
 	}
-	var p panel.Panel
-	err = panel.DB.Where("domain = ?", domain).First(&p).Error
+	var p nbdomain.Panel
+	err = nbdomain.DB.Where("domain = ?", domain).First(&p).Error
 	if err != nil {
 		//不是米表，试试域名
-		var d panel.Domain
-		err = panel.DB.Where("domain = ?", domain).First(&d).Error
+		var d nbdomain.Domain
+		err = nbdomain.DB.Where("domain = ?", domain).First(&d).Error
 		//未找到域名，跳转平台首页
 		if err != nil {
-			c.Redirect(http.StatusTemporaryRedirect, "https://"+panel.CF.Web.Domain)
+			c.Redirect(http.StatusTemporaryRedirect, "https://"+nbdomain.CF.Web.Domain)
 			return false
 		}
 		//会员过期，提示已过期
-		panel.DB.Model(&d).Related(&d.User)
+		nbdomain.DB.Model(&d).Related(&d.User)
 		if d.User.SuperVIPExpire.Before(time.Now()) {
 			c.String(http.StatusForbidden, "您还不是超级会员，无法享用「域名停放」功能。")
 			return false
 		}
 		//会员正常，取米表详情
-		panel.DB.Model(&d).Related(&d.Panel)
-		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.Panel.Domain+"/offer/"+domain)
+		nbdomain.DB.Model(&d).Related(&d.Panel)
+		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.nbdomain.Domain+"/offer/"+domain)
 		return false
 	}
 	//是米表，检查会员到期
-	panel.DB.Model(&p).Related(&p.User)
+	nbdomain.DB.Model(&p).Related(&p.User)
 	if p.User.GoldVIPExpire.Before(time.Now()) && p.User.SuperVIPExpire.Before(time.Now()) {
 		c.String(http.StatusForbidden, "您还不是会员，无法享用「米表」功能。")
 		return false
@@ -71,13 +71,13 @@ func Allow(c *gin.Context) {
 	// 	return
 	// }
 	domain := c.Query("domain")
-	var p panel.Panel
-	err := panel.DB.Where("domain = ?", domain).First(&p).Error
+	var p nbdomain.Panel
+	err := nbdomain.DB.Where("domain = ?", domain).First(&p).Error
 	if err != nil {
 		c.Status(http.StatusForbidden)
 		return
 	}
-	panel.DB.Model(&p).Related(&p.User)
+	nbdomain.DB.Model(&p).Related(&p.User)
 	if p.User.SuperVIPExpire.Before(time.Now()) {
 		c.Status(http.StatusForbidden)
 		return
@@ -89,10 +89,10 @@ func Index(c *gin.Context) {
 	if !checkExpire(c) {
 		return
 	}
-	p := c.MustGet("Panel").(panel.Panel)
-	panel.DB.Model(&p).Order("index").Association("cats").Find(&p.Cats)
+	p := c.MustGet("Panel").(nbdomain.Panel)
+	nbdomain.DB.Model(&p).Order("index").Association("cats").Find(&p.Cats)
 	for i := 0; i < len(p.Cats); i++ {
-		panel.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
+		nbdomain.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
 	}
 	isChinese := c.GetBool("Chinese")
 	var title string
@@ -102,7 +102,7 @@ func Index(c *gin.Context) {
 		title = p.NameEn
 	}
 	c.HTML(http.StatusOK, p.Theme+"/index", gin.H{
-		"Static":  "https://" + panel.CF.Web.Domain,
+		"Static":  "https://" + nbdomain.CF.Web.Domain,
 		"Title":   title,
 		"Panel":   p,
 		"Chinese": isChinese,
@@ -114,9 +114,9 @@ func Offer(c *gin.Context) {
 	if !checkExpire(c) {
 		return
 	}
-	p := c.MustGet("Panel").(panel.Panel)
-	var d panel.Domain
-	if panel.DB.Where("domain = ?", c.Param("domain")).First(&d).Error != nil {
+	p := c.MustGet("Panel").(nbdomain.Panel)
+	var d nbdomain.Domain
+	if nbdomain.DB.Where("domain = ?", c.Param("domain")).First(&d).Error != nil {
 		if c.Request.Method == http.MethodGet {
 			c.Redirect(http.StatusTemporaryRedirect, "https://"+p.Domain)
 		} else {
@@ -134,7 +134,7 @@ func Offer(c *gin.Context) {
 			title = d.Domain + " may be for sale - " + p.NameEn
 		}
 		c.HTML(http.StatusOK, p.OfferTheme+"/offer", gin.H{
-			"Static":  "https://" + panel.CF.Web.Domain,
+			"Static":  "https://" + nbdomain.CF.Web.Domain,
 			"Title":   title,
 			"Panel":   p,
 			"Domain":  d,
@@ -160,14 +160,14 @@ func Offer(c *gin.Context) {
 			c.String(http.StatusForbidden, "ReCaptcha验证未通过。")
 			return
 		}
-		var o panel.Offer
+		var o nbdomain.Offer
 		o.Amount = of.Amount
 		o.Currency = of.Currency
 		o.Domain = c.Param("domain")
 		o.UserID = d.UserID
 		o.Name = of.Name
 		o.Mail = of.Mail
-		if err := panel.DB.Save(&o).Error; err != nil {
+		if err := nbdomain.DB.Save(&o).Error; err != nil {
 			log.Println(err)
 			c.String(http.StatusInternalServerError, "服务器错误")
 			return

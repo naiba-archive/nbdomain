@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/naiba/domain-panel"
-	"github.com/naiba/domain-panel/controller/cat"
-	"github.com/naiba/domain-panel/controller/domain"
-	"github.com/naiba/domain-panel/controller/mibiao"
-	"github.com/naiba/domain-panel/controller/panelr"
-	"github.com/naiba/domain-panel/controller/user"
-	"github.com/naiba/domain-panel/controller/whois"
-	"github.com/naiba/domain-panel/pkg/mygin"
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/controller/cat"
+	"github.com/naiba/nbdomain/controller/domain"
+	"github.com/naiba/nbdomain/controller/mibiao"
+	"github.com/naiba/nbdomain/controller/panelr"
+	"github.com/naiba/nbdomain/controller/user"
+	"github.com/naiba/nbdomain/controller/whois"
+	"github.com/naiba/nbdomain/pkg/mygin"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ import (
 //Web start
 func Web() {
 	var mode string
-	if panel.CF.Debug {
+	if nbdomain.CF.Debug {
 		mode = gin.DebugMode
 	} else {
 		mode = gin.ReleaseMode
@@ -36,7 +36,7 @@ func Web() {
 	})
 	r.LoadHTMLGlob("theme/template/**/*")
 	r.Static("static", "theme/static")
-	if panel.CF.Debug {
+	if nbdomain.CF.Debug {
 		conf := cors.DefaultConfig()
 		conf.AllowAllOrigins = true
 		conf.AddAllowMethods("DELETE")
@@ -78,12 +78,12 @@ func Web() {
 			authUser.PUT("panel", panelr.Edit)
 			authUser.GET("themes", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
-					"themes":       panel.ThemeList,
-					"offer_themes": panel.OfferThemeList,
+					"themes":       nbdomain.ThemeList,
+					"offer_themes": nbdomain.OfferThemeList,
 				})
 			})
 			authUser.GET("analysis_types", func(c *gin.Context) {
-				c.JSON(http.StatusOK, panel.AnalysisTypes)
+				c.JSON(http.StatusOK, nbdomain.AnalysisTypes)
 			})
 			authUser.DELETE("panel/:id", panelr.Delete)
 			authUser.GET("panel/:id/cats", panelr.ListCats)
@@ -101,5 +101,5 @@ func Web() {
 			authUser.GET("whois/:domain", whois.Whois)
 		}
 	}
-	go r.Run(panel.CF.Web.Addr)
+	go r.Run(nbdomain.CF.Web.Addr)
 }

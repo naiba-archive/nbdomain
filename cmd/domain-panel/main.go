@@ -4,20 +4,20 @@ import (
 	"errors"
 	"time"
 
-	"github.com/naiba/domain-panel"
-	"github.com/naiba/domain-panel/controller"
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/controller"
 	whois "github.com/likexian/whois-go"
 	parser "github.com/likexian/whois-parser-go"
 )
 
 func init() {
-	panel.DB.AutoMigrate(
-		panel.User{},
-		panel.Panel{},
-		panel.Cat{},
-		panel.Domain{},
-		panel.Offer{},
-		panel.Order{},
+	nbdomain.DB.AutoMigrate(
+		nbdomain.User{},
+		nbdomain.Panel{},
+		nbdomain.Cat{},
+		nbdomain.Domain{},
+		nbdomain.Offer{},
+		nbdomain.Order{},
 	)
 }
 
@@ -28,9 +28,9 @@ func main() {
 }
 
 func updateWhois() {
-	var domains []panel.Domain
+	var domains []nbdomain.Domain
 	for {
-		panel.DB.Where("whois_update is NULL or DATEDIFF(now(),whois_update)>7").Find(&domains)
+		nbdomain.DB.Where("whois_update is NULL or DATEDIFF(now(),whois_update)>7").Find(&domains)
 		for _, domain := range domains {
 			result, err := whois.Whois(domain.Domain)
 			var create, expire time.Time
@@ -44,7 +44,7 @@ func updateWhois() {
 					register = parsed.Registrar.RegistrarName
 				}
 			}
-			panel.DB.Model(&domain).UpdateColumns(panel.Domain{
+			nbdomain.DB.Model(&domain).UpdateColumns(nbdomain.Domain{
 				Registrar:   register,
 				Create:      create,
 				Expire:      expire,

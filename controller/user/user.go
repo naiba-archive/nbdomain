@@ -14,25 +14,25 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/naiba/domain-panel/pkg/mygin"
+	"github.com/naiba/nbdomain/pkg/mygin"
 
-	"github.com/naiba/domain-panel"
-	"github.com/naiba/domain-panel/service"
+	"github.com/naiba/nbdomain"
+	"github.com/naiba/nbdomain/service"
 
 	oidc "github.com/coreos/go-oidc"
 	"github.com/gin-gonic/gin"
 	"github.com/smartwalle/alipay"
 )
 
-var client = alipay.New(panel.CF.Alipay.Appid, "", panel.CF.Alipay.Pubkey, panel.CF.Alipay.Prikey, panel.CF.Alipay.Prod)
+var client = alipay.New(nbdomain.CF.Alipay.Appid, "", nbdomain.CF.Alipay.Pubkey, nbdomain.CF.Alipay.Prikey, nbdomain.CF.Alipay.Prod)
 
 func procNotify(nti *alipay.TradeNotification) error {
-	var o panel.Order
-	if err := panel.DB.Where("id = ?", nti.OutTradeNo).First(&o).Error; err != nil {
+	var o nbdomain.Order
+	if err := nbdomain.DB.Where("id = ?", nti.OutTradeNo).First(&o).Error; err != nil {
 		return err
 	}
 	if !o.Finish {
-		panel.DB.Model(&o).Related(&o.User)
+		nbdomain.DB.Model(&o).Related(&o.User)
 		if o.What == "gold" {
 			if o.User.GoldVIPExpire.Before(time.Now()) {
 				o.User.GoldVIPExpire = time.Now().Add(time.Hour * 24 * 30)
@@ -46,7 +46,7 @@ func procNotify(nti *alipay.TradeNotification) error {
 				o.User.SuperVIPExpire = o.User.SuperVIPExpire.Add(time.Hour * 24 * 30)
 			}
 		}
-		return panel.DB.Save(&o.User).Error
+		return nbdomain.DB.Save(&o.User).Error
 	}
 	return nil
 }
@@ -88,7 +88,7 @@ func init() {
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 		Endpoint:     provider.Endpoint(),
-		RedirectURL:  "https://" + panel.CF.Web.Domain + "/hack/oauth2-redirect",
+		RedirectURL:  "https://" + nbdomain.CF.Web.Domain + "/hack/oauth2-redirect",
 		Scopes:       []string{oidc.ScopeOpenID, "profile"},
 	}
 }
@@ -146,16 +146,16 @@ func Oauth2LoginCallback(c *gin.Context) {
 	}
 	oid := x["IDTokenClaims"]["sub"]
 	username := x["IDTokenClaims"]["name"]
-	var u panel.User
+	var u nbdomain.User
 	var newUser = false
-	err = panel.DB.Model(panel.User{}).Where("ucenter_id = ?", oid).First(&u).Error
+	err = nbdomain.DB.Model(nbdomain.User{}).Where("ucenter_id = ?", oid).First(&u).Error
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {
 			c.String(http.StatusForbidden, err.Error())
 			return
 		}
 		newUser = true
-		u = panel.User{
+		u = nbdomain.User{
 			UcenterID: oid.(string),
 		}
 	}
@@ -163,7 +163,7 @@ func Oauth2LoginCallback(c *gin.Context) {
 		u.UcenterExtra = username.(string)
 	}
 	if newUser {
-		panel.DB.Create(&u)
+		nbdomain.DB.Create(&u)
 		u.GoldVIPExpire = time.Now()
 		u.SuperVIPExpire = u.GoldVIPExpire
 		if u.ID == 1 {
@@ -179,7 +179,7 @@ func Oauth2LoginCallback(c *gin.Context) {
 
 // Oauth2Redirect 烧饼社群登录跳转
 func Oauth2Redirect(c *gin.Context) {
-	c.Redirect(http.StatusFound, "https://"+panel.CF.Web.Domain+"/#/?code="+c.Query("code")+"&state="+c.Query("state"))
+	c.Redirect(http.StatusFound, "https://"+nbdomain.CF.Web.Domain+"/#/?code="+c.Query("code")+"&state="+c.Query("state"))
 }
 
 //Return 同步回调
@@ -204,12 +204,12 @@ func Pay(c *gin.Context) {
 		c.String(http.StatusForbidden, what+"是什么会员？？")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(panel.User)
-	var o panel.Order
+	u := c.MustGet(mygin.KUser).(nbdomain.User)
+	var o nbdomain.Order
 	o.UserID = u.ID
 	var p = alipay.AliPayTradePagePay{}
-	p.NotifyURL = "https://" + panel.CF.Web.Domain + "/hack/pay-notify"
-	p.ReturnURL = "https://" + panel.CF.Web.Domain + "/hack/pay-return"
+	p.NotifyURL = "https://" + nbdomain.CF.Web.Domain + "/hack/pay-notify"
+	p.ReturnURL = "https://" + nbdomain.CF.Web.Domain + "/hack/pay-return"
 	p.TotalAmount = func() string {
 		if what == "gold" {
 			return "5.00"
@@ -218,7 +218,7 @@ func Pay(c *gin.Context) {
 	}()
 	p.Subject = "「" + what + "」会员续费"
 	o.What = what
-	if panel.DB.Save(&o).Error != nil {
+	if nbdomain.DB.Save(&o).Error != nil {
 		c.String(http.StatusInternalServerError, "服务器错误，订单入库")
 		return
 	}
@@ -246,16 +246,16 @@ func Settings(c *gin.Context) {
 		c.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(panel.User)
+	u := c.MustGet(mygin.KUser).(nbdomain.User)
 	u.Weixin = lf.Weixin
 	u.QQ = lf.QQ
 	u.Phone = lf.Phone
 	u.Name = lf.Name
 	var err error
 	if c.Request.Method == http.MethodPost {
-		err = panel.DB.Save(&u).Error
+		err = nbdomain.DB.Save(&u).Error
 	} else {
-		err = panel.DB.Model(&u).Update(u).Error
+		err = nbdomain.DB.Model(&u).Update(u).Error
 	}
 	if err != nil {
 		log.Println("database error", err.Error())

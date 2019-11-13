@@ -3,7 +3,7 @@ package service
 import (
 	"log"
 
-	"github.com/naiba/domain-panel"
+	"github.com/naiba/nbdomain"
 
 	"github.com/matcornic/hermes"
 	"gopkg.in/gomail.v2"
@@ -53,14 +53,14 @@ func (ms MailService) SendMail(toMail, subj string, mail hermes.Email, mType int
 		return false
 	}
 	m := gomail.NewMessage()
-	m.SetHeader("From", panel.CF.Mail.User)
+	m.SetHeader("From", nbdomain.CF.Mail.User)
 	m.SetHeader("To", toMail)
-	m.SetAddressHeader("Cc", panel.CF.Mail.User, "LifelongSender")
+	m.SetAddressHeader("Cc", nbdomain.CF.Mail.User, "LifelongSender")
 	m.SetHeader("Subject", subj)
 	m.SetBody(contentType, mailBody)
 	// m.Attach("/home/Alex/lolcat.jpg")
-	d := gomail.NewPlainDialer(panel.CF.Mail.SMTP, panel.CF.Mail.Port, panel.CF.Mail.User, panel.CF.Mail.Pass)
-	d.SSL = panel.CF.Mail.SSL
+	d := gomail.NewPlainDialer(nbdomain.CF.Mail.SMTP, nbdomain.CF.Mail.Port, nbdomain.CF.Mail.User, nbdomain.CF.Mail.Pass)
+	d.SSL = nbdomain.CF.Mail.SSL
 	if err := d.DialAndSend(m); err != nil {
 		log.Println(err)
 		return false

@@ -1,44 +1,16 @@
-package panel
+package nbdomain
 
 import (
 	"github.com/jinzhu/gorm"
 	//MySQL 驱动
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/spf13/viper"
+
+	"github.com/naiba/nbdomain/model"
 )
 
-//Config 全局配置
-type Config struct {
-	Debug bool
-	Web   struct {
-		Addr   string
-		Domain string
-	}
-	Alipay struct {
-		Prikey string
-		Pubkey string
-		Appid  string
-		Prod   bool
-	}
-	Mail struct {
-		SMTP string `mapstructure:"smtp"`
-		Port int
-		User string
-		Pass string
-		SSL  bool `mapstructure:"ssl"`
-	}
-	Database struct {
-		User   string
-		Pass   string
-		Server string
-		Name   string
-		Loc    string
-	}
-	ReCaptcha string `mapstructure:"recaptcha"`
-}
-
 //CF 全局配置
-var CF Config
+var CF model.Config
 
 //DB 数据库连接
 var DB *gorm.DB

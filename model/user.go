@@ -32,10 +32,10 @@ type User struct {
 }
 
 //GenerateToken 生成用户Token
-func (u *User) GenerateToken() error {
-	token := com.MD5(fmt.Sprintf("%d%d%d%s", u.UcenterID, u.ID, time.Now().UnixNano(), com.RandomString(10)))
+func (u *User) GenerateToken(db *gorm.DB) error {
+	token := com.MD5(fmt.Sprintf("%s%d%d%s", u.UcenterID, u.ID, time.Now().UnixNano(), com.RandomString(10)))
 	u.Token = &token
-	return DB.Save(u).Error
+	return db.Save(u).Error
 }
 
 //SID 字符串ID

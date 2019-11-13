@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/naiba/domain-panel/pkg/mygin"
+	"github.com/naiba/nbdomain/pkg/mygin"
 
-	"github.com/naiba/domain-panel"
+	"github.com/naiba/nbdomain"
 	"github.com/gin-gonic/gin"
 	whois "github.com/likexian/whois-go"
 	parser "github.com/likexian/whois-parser-go"
@@ -20,7 +20,7 @@ func Whois(c *gin.Context) {
 		c.String(http.StatusForbidden, "域名格式不符合规范")
 		return
 	}
-	u := c.MustGet(mygin.KUser).(panel.User)
+	u := c.MustGet(mygin.KUser).(nbdomain.User)
 	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
 		c.String(http.StatusForbidden, "会员到期")
 		return

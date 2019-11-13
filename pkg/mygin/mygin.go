@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	panel "github.com/naiba/domain-panel"
 	"github.com/gin-gonic/gin"
+	"github.com/naiba/nbdomain"
 )
 
 //KChinese 语言
@@ -24,12 +24,12 @@ type AuthOption struct {
 //Authorize 鉴权
 func Authorize(o AuthOption) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var u panel.User
+		var u nbdomain.User
 		token := ctx.Request.Header.Get("Authorization")
 		if len(token) != 32 {
 			token = ctx.Query("Authorization")
 		}
-		if len(token) != 32 || panel.DB.Where("token = ?", token).First(&u).Error != nil {
+		if len(token) != 32 || nbdomain.DB.Where("token = ?", token).First(&u).Error != nil {
 			if o.NeedAdmin || o.NeedUser {
 				ctx.String(http.StatusUnauthorized, "登录状态已失效，请您重新登录。")
 				ctx.Abort()
@@ -78,5 +78,5 @@ func TmplVars(ctx *gin.Context, data TmplData) gin.H {
 //SetCookie 设置Cookie
 func SetCookie(k, v string, ctx *gin.Context) {
 	panic("can't set cookie in API")
-	//ctx.SetCookie(k, v, 60*60*24*365*2, "/", panel.CF.Web.Domain, false, false)
+	//ctx.SetCookie(k, v, 60*60*24*365*2, "/", nbdomain.CF.Web.Domain, false, false)
 }
