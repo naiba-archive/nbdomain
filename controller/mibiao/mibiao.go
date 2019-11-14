@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/naiba/nbdomain"
 	"github.com/naiba/nbdomain/model"
@@ -35,23 +34,13 @@ func checkExpire(c *gin.Context) bool {
 			c.Redirect(http.StatusTemporaryRedirect, "https://"+nbdomain.CF.Web.Domain)
 			return false
 		}
-		//会员过期，提示已过期
-		nbdomain.DB.Model(&d).Related(&d.User)
-		if d.User.SuperVIPExpire.Before(time.Now()) {
-			c.String(http.StatusForbidden, "您还不是超级会员，无法享用「域名停放」功能。")
-			return false
-		}
-		//会员正常，取米表详情
+		//取米表详情
 		nbdomain.DB.Model(&d).Related(&d.Panel)
 		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.Domain+"/offer/"+domain)
 		return false
 	}
 	//是米表，检查会员到期
 	nbdomain.DB.Model(&p).Related(&p.User)
-	if p.User.GoldVIPExpire.Before(time.Now()) && p.User.SuperVIPExpire.Before(time.Now()) {
-		c.String(http.StatusForbidden, "您还不是会员，无法享用「米表」功能。")
-		return false
-	}
 	//设置默认主题
 	if p.Theme == "" {
 		p.Theme = "offical-superhero"
@@ -79,10 +68,6 @@ func Allow(c *gin.Context) {
 		return
 	}
 	nbdomain.DB.Model(&p).Related(&p.User)
-	if p.User.SuperVIPExpire.Before(time.Now()) {
-		c.Status(http.StatusForbidden)
-		return
-	}
 }
 
 //Index 米表首页

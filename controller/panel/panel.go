@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -129,39 +128,6 @@ func Edit(c *gin.Context) {
 	}
 
 	u := c.MustGet(mygin.KUser).(model.User)
-
-	// 查询会员是否有效
-	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
-		c.String(http.StatusForbidden, "您还不是会员，无法进行此操作")
-		return
-	}
-
-	// 根据会员等级限制米表数量
-	var panelCount int
-	nbdomain.DB.Where("user_id = ?").Find(model.Panel{}).Count(&panelCount)
-	if u.SuperVIPExpire.After(time.Now()) {
-		// 限制数量
-		if panelCount > 5 {
-			c.String(http.StatusForbidden, "您的米表数超过5，无法进行此操作")
-			return
-		}
-	} else {
-		// 限制米表主题
-		if pf.Theme != "offical-superhero" {
-			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
-			return
-		}
-		// 限制Offer主题
-		if pf.OfferTheme != "offical-superhero" {
-			c.String(http.StatusForbidden, "您是黄金会员，只能使用「superhero」主题")
-			return
-		}
-		// 限制数量
-		if panelCount > 1 {
-			c.String(http.StatusForbidden, "您的米表数超过1，无法进行此操作，建议您升级会员")
-			return
-		}
-	}
 
 	//如果是修改米表，鉴权
 	var p model.Panel

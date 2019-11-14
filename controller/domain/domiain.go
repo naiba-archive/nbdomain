@@ -124,27 +124,6 @@ func Edit(c *gin.Context) {
 	}
 	u := c.MustGet(mygin.KUser).(model.User)
 
-	// 查询会员是否有效
-	if u.GoldVIPExpire.Before(time.Now()) && u.SuperVIPExpire.Before(time.Now()) {
-		c.String(http.StatusForbidden, "您还不是会员，无法进行此操作")
-		return
-	}
-
-	// 根据会员等级限制域名数量
-	var domainCount int
-	nbdomain.DB.Where("user_id = ?").Find(model.Domain{}).Count(&domainCount)
-	if u.SuperVIPExpire.After(time.Now()) {
-		if domainCount > 1000 {
-			c.String(http.StatusForbidden, "您的域名数超过1000，无法进行此操作")
-			return
-		}
-	} else {
-		if domainCount > 100 {
-			c.String(http.StatusForbidden, "您的域名数超过100，无法进行此操作，建议您升级会员")
-			return
-		}
-	}
-
 	var cat model.Cat
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.CatID).First(&cat).Error != nil {
 		c.String(http.StatusForbidden, "分类不存在。")

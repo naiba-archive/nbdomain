@@ -61,6 +61,8 @@ func Web() {
 	}
 	api := r.Group("/api")
 	{
+		api.POST("login", user.Login)
+
 		authUser := api.Group("")
 		{
 			authUser.Use(mygin.Authorize(mygin.AuthOption{NeedUser: true}))
