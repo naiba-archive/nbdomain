@@ -26,6 +26,7 @@ require (
 	github.com/smartwalle/alipay v1.0.2
 	github.com/spf13/viper v1.5.0
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
+	golang.org/x/crypto v0.0.0-20190325154230-a5d413f7728c
 	golang.org/x/net v0.0.0-20191112182307-2180aed22343
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

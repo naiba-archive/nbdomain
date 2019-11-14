@@ -24,6 +24,7 @@ www.riluo.cn/upload/ {
 www.riluo.cn/static/ {
         root /home/www/runcuo/theme/static/
 }
+
 :80 {
         proxy / 127.0.0.1:8034 {
                 timeout 5m
