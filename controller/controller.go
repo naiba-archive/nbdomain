@@ -66,6 +66,7 @@ func Web() {
 		authUser := api.Group("")
 		{
 			authUser.Use(mygin.Authorize(mygin.AuthOption{NeedUser: true}))
+			authUser.GET("user", user.GET)
 			authUser.PUT("user", user.Settings)
 			authUser.GET("offers", panel.Offers)
 			authUser.PUT("panel", panel.Edit)

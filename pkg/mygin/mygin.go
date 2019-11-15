@@ -28,10 +28,10 @@ func Authorize(o AuthOption) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var u model.User
 		token := ctx.Request.Header.Get("Authorization")
-		if len(token) != 32 {
+		if len(token) == 0 {
 			token = ctx.Query("Authorization")
 		}
-		if len(token) != 32 || nbdomain.DB.Where("token = ?", token).First(&u).Error != nil {
+		if len(token) < 6 || nbdomain.DB.Where("token = ?", token[6:]).First(&u).Error != nil {
 			if o.NeedAdmin || o.NeedUser {
 				ctx.String(http.StatusUnauthorized, "登录状态已失效，请您重新登录。")
 				ctx.Abort()

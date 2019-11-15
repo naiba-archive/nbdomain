@@ -24,9 +24,9 @@ function onStatusError(error: AxiosError | Error) {
       message: '登录信息失效',
       description: '即将跳转到登录界面',
     });
-    localStorage.removeItem('pay-token');
-    localStorage.removeItem('pay-expired');
-    window.location.href = '/user/login';
+    // localStorage.removeItem('nbdomain-token');
+    // localStorage.removeItem('nbdomain-token-expired');
+    // window.location.href = '/user/login';
   }
   notification.error({
     message: `请求错误 ${err.code}`,
@@ -64,8 +64,8 @@ export class WrappedFetch {
     };
 
     // 授权 token
-    const token = localStorage.getItem('pay-token');
-    const expired = localStorage.getItem('pay-expired');
+    const token = localStorage.getItem('nbdomain-token');
+    const expired = localStorage.getItem('nbdomain-token-expired');
     if (token && expired && Date.parse(expired) > new Date().getMilliseconds()) {
       config.headers.Authorization = `token ${token}`;
     }

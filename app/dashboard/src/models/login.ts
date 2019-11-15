@@ -82,7 +82,7 @@ const Model: LoginModelType = {
       setAuthority('admin');
       // 设置 Token 及 过期时间
       localStorage.setItem('nbdomain-token', payload.token);
-      localStorage.setItem('nbdomain-token-expired', payload.token_expired);
+      localStorage.setItem('nbdomain-token-expired', payload.token_expire);
       return {
         ...state,
         status: payload.status,

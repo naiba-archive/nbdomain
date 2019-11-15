@@ -1,6 +1,8 @@
 import { Effect } from 'dva';
 import { Reducer } from 'redux';
 
+import { APIS } from '@/services/';
+
 export interface CurrentUser {
   avatar?: string;
   name?: string;
@@ -11,7 +13,7 @@ export interface CurrentUser {
     key: string;
     label: string;
   }[];
-  userid?: string;
+  id?: string;
   unreadCount?: number;
 }
 
@@ -48,7 +50,7 @@ const UserModel: UserModelType = {
       });
     },
     *fetchCurrent(_, { call, put }) {
-      const response = yield call(null);
+      const response = yield call(APIS.DefaultApi.userGet);
       yield put({
         type: 'saveCurrentUser',
         payload: response,

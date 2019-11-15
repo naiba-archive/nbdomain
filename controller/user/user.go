@@ -16,6 +16,15 @@ import (
 	"github.com/naiba/nbdomain/pkg/mygin"
 )
 
+// GET ..
+func GET(c *gin.Context) {
+	u := c.MustGet(mygin.KUser).(model.User)
+	var r model.Response
+	r.Code = http.StatusOK
+	r.Result = u
+	c.JSON(http.StatusOK, r)
+}
+
 type loginForm struct {
 	Mail      string `json:"mail" binding:"required|email"`
 	Password  string `json:"password" binding:"required"`
