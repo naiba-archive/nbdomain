@@ -17,8 +17,9 @@ import (
 )
 
 type loginForm struct {
-	Mail     string `json:"mail" binding:"required|email"`
-	Password string `json:"password" binding:"required"`
+	Mail      string `json:"mail" binding:"required|email"`
+	Password  string `json:"password" binding:"required"`
+	AutoLogin bool   `json:"auto_login"`
 }
 
 // Login 用户登录
@@ -64,6 +65,14 @@ func Login(c *gin.Context) {
 	if err != nil || lf.Mail == "" || u.Mail != lf.Mail {
 		r.Code = http.StatusForbidden
 		r.Message = "邮箱或密码错误"
+		c.JSON(http.StatusOK, r)
+		return
+	}
+
+	// 生成 Token
+	if err = u.GenerateToken(nbdomain.DB, lf.AutoLogin); err != nil {
+		r.Code = http.StatusInternalServerError
+		r.Message = fmt.Sprintf("数据库出错啦：%s", err)
 		c.JSON(http.StatusOK, r)
 		return
 	}
