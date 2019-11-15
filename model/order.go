@@ -1,12 +1,8 @@
 package model
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 //Order 订单
 type Order struct {
-	gorm.Model
+	Common
 	What   string
 	UserID uint
 	Finish bool

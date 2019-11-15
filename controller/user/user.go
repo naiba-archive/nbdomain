@@ -28,7 +28,7 @@ func Login(c *gin.Context) {
 
 	var lf loginForm
 	if err := c.ShouldBindJSON(&lf); err != nil {
-		r.Code = http.StatusForbidden
+		r.Code = http.StatusBadRequest
 		r.Message = fmt.Sprintf("数据填写有误：%s", err)
 		c.JSON(http.StatusOK, r)
 		return
@@ -63,7 +63,7 @@ func Login(c *gin.Context) {
 
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(lf.Password))
 	if err != nil || lf.Mail == "" || u.Mail != lf.Mail {
-		r.Code = http.StatusForbidden
+		r.Code = http.StatusBadRequest
 		r.Message = "邮箱或密码错误"
 		c.JSON(http.StatusOK, r)
 		return
@@ -94,7 +94,7 @@ func Settings(c *gin.Context) {
 	var lf settingForm
 	if err := c.ShouldBind(&lf); err != nil {
 		log.Println(err)
-		c.String(http.StatusForbidden, "您的输入不符合规范，请检查后重试")
+		c.String(http.StatusBadRequest, "您的输入不符合规范，请检查后重试")
 		return
 	}
 	u := c.MustGet(mygin.KUser).(model.User)

@@ -182,7 +182,7 @@ export default {
   chainWebpack: webpackPlugin,
   proxy: {
     '/api/': {
-      target: 'https://api.nai.ba/mock/33',
+      target: 'http://localhost:8080/',
       changeOrigin: true,
       // pathRewrite: { '^/server': '' },
     },

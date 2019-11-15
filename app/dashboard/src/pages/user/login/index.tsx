@@ -1,4 +1,4 @@
-import { Alert, Checkbox } from 'antd';
+import { Alert, Checkbox, notification } from 'antd';
 import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
 import React, { Component } from 'react';
 
@@ -41,15 +41,15 @@ class Login extends Component<LoginProps, LoginState> {
     });
   };
 
-  handleSubmit = (err: unknown, values: LoginParamsType) => {
-    const { type } = this.state;
+  handleSubmit = (err: unknown, values: any) => {
+    const { autoLogin } = this.state;
     if (!err) {
       const { dispatch } = this.props;
       dispatch({
         type: 'login/login',
         payload: {
           ...values,
-          type,
+          'auto-login': autoLogin,
         },
       });
     }
@@ -57,6 +57,12 @@ class Login extends Component<LoginProps, LoginState> {
 
   onTabChange = (type: string) => {
     this.setState({ type });
+  };
+
+  onClickForgotPassword = () => {
+    notification.warn({
+      message: '功能尚未开发',
+    });
   };
 
   renderMessage = (content: string) => (
@@ -115,7 +121,7 @@ class Login extends Component<LoginProps, LoginState> {
             <Checkbox checked={autoLogin} onChange={this.changeAutoLogin}>
               <FormattedMessage id="user-login.login.remember-me" />
             </Checkbox>
-            <a style={{ float: 'right' }} href="">
+            <a style={{ float: 'right' }} onClick={this.onClickForgotPassword}>
               <FormattedMessage id="user-login.login.forgot-password" />
             </a>
           </div>

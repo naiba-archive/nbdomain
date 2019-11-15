@@ -2,11 +2,6 @@ debug: false
 web:
   addr: 0.0.0.0:8080
   domain: localhost
-alipay:
-  prikey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  pubkey: "xxxxxxxxxxxxxxxxxxxxxxxxx"
-  appid: xxxxxxxxxx
-  prod: false
 mail:
   smtp: smtp.163.com
   port: 994

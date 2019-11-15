@@ -2,13 +2,11 @@ package model
 
 import (
 	"time"
-
-	"github.com/jinzhu/gorm"
 )
 
 //Domain 域名
 type Domain struct {
-	gorm.Model
+	Common
 	UserID      uint
 	CatID       uint
 	PanelID     uint

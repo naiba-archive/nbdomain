@@ -2,8 +2,6 @@ package model
 
 import (
 	"fmt"
-
-	"github.com/jinzhu/gorm"
 )
 
 //ThemeList 主题列表
@@ -28,7 +26,7 @@ var AnalysisTypes = map[string]string{
 
 //Panel 米表
 type Panel struct {
-	gorm.Model
+	Common
 	UserID       uint
 	Domain       string `gorm:"type:varchar(100);unique_index"`
 	Name         string

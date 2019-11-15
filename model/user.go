@@ -11,21 +11,21 @@ import (
 
 //User model
 type User struct {
-	gorm.Model
-	Mail        string `gorm:"type:varchar(50);unique_index"`
-	Password    string `json:"-"`
-	IsAdmin     bool
-	Token       *string `gorm:"type:varchar(100);unique_index"`
-	TokenExpire time.Time
-	Name        string
-	Phone       string
-	QQ          string
-	Weixin      string
+	Common
+	Mail        string    `gorm:"type:varchar(50);unique_index" json:"mail,omitempty"`
+	Password    string    `json:"-"`
+	IsAdmin     bool      `json:"is_admin,omitempty"`
+	Token       *string   `gorm:"type:varchar(100);unique_index" json:"token,omitempty"`
+	TokenExpire time.Time `json:"token_expire,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	Phone       string    `json:"phone,omitempty"`
+	QQ          string    `json:"qq,omitempty"`
+	Weixin      string    `json:"weixin,omitempty"`
 
-	Domains []Domain `json:",omitempty"`
-	Panels  []Panel  `json:",omitempty"`
-	Cats    []Cat    `json:",omitempty"`
-	Offers  []Offer  `json:",omitempty"`
+	Domains []Domain `json:"domains,omitempty"`
+	Panels  []Panel  `json:"panels,omitempty"`
+	Cats    []Cat    `json:"cats,omitempty"`
+	Offers  []Offer  `json:"offers,omitempty"`
 }
 
 //GenerateToken 生成用户Token

@@ -1,12 +1,8 @@
 package model
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 //Offer 报价
 type Offer struct {
-	gorm.Model
+	Common
 	Currency string
 	Name     string
 	Mail     string

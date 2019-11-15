@@ -1,12 +1,8 @@
 package model
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 //Cat 分类
 type Cat struct {
-	gorm.Model
+	Common
 	PanelID uint
 	UserID  uint
 	Name    string
