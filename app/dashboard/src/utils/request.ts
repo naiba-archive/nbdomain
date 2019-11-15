@@ -1,56 +1,132 @@
-/**
- * request 网络请求工具
- * 更详细的 api 文档: https://github.com/umijs/umi-request
- */
-import { extend } from 'umi-request';
+import axios, { AxiosError } from 'axios';
+import qs from 'qs';
 import { notification } from 'antd';
 
-const codeMessage = {
-  200: '服务器成功返回请求的数据。',
-  201: '新建或修改数据成功。',
-  202: '一个请求已经进入后台排队（异步任务）。',
-  204: '删除数据成功。',
-  400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
-  401: '用户没有权限（令牌、用户名、密码错误）。',
-  403: '用户得到授权，但是访问是被禁止的。',
-  404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
-  406: '请求的格式不可得。',
-  410: '请求的资源被永久删除，且不会再得到的。',
-  422: '当创建一个对象时，发生一个验证错误。',
-  500: '服务器发生错误，请检查服务器。',
-  502: '网关错误。',
-  503: '服务不可用，服务器暂时过载或维护。',
-  504: '网关超时。',
-};
-
-/**
- * 异常处理程序
- */
-const errorHandler = (error: { response: Response }): Response => {
-  const { response } = error;
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
-
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
-  } else if (!response) {
-    notification.error({
-      description: '您的网络发生异常，无法连接服务器',
-      message: '网络异常',
-    });
-  }
-  return response;
-};
-
-/**
- * 配置request请求时的默认参数
- */
-const request = extend({
-  errorHandler, // 默认错误处理
-  credentials: 'include', // 默认请求是否带上cookie
+const inst = axios.create({
+  timeout: 20000,
+  withCredentials: true,
+  headers: {},
 });
 
-export default request;
+// @cc: 检测 axios 响应状态
+function onStatusError(error: AxiosError | Error) {
+  const err =
+    'response' in error && error.response
+      ? {
+          code: error.response.status,
+          message: error.response.statusText,
+        }
+      : { code: 9999, message: error.message };
+  if (err.code === 401 || err.code === 403) {
+    // @todo 未登录未授权
+    // EventCenter.emit('common.user.status', err);
+    notification.error({
+      message: '登录信息失效',
+      description: '即将跳转到登录界面',
+    });
+    localStorage.removeItem('pay-token');
+    localStorage.removeItem('pay-expired');
+    window.location.href = '/user/login';
+  }
+  notification.error({
+    message: `请求错误 ${err.code}`,
+    description: err.message,
+  });
+  return false;
+}
+
+export type AjaxPromise<R> = Promise<R>;
+
+export interface ExtraFetchParams {
+  extra?: any;
+}
+
+export interface WrappedFetchParams extends ExtraFetchParams {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'PATCH' | 'HEAD';
+  url: string;
+  data?: any; // post json
+  form?: any; // post form
+  query?: any;
+  header?: any;
+  path?: any;
+}
+
+export class WrappedFetch {
+  /**
+   * @description ajax 方法
+   */
+  // eslint-disable-next-line
+  public async ajax({ method, url, data, form, query, header, extra }: WrappedFetchParams) {
+    let config = {
+      ...extra,
+      method: method.toLocaleLowerCase(),
+      headers: { ...header },
+    };
+
+    // 授权 token
+    const token = localStorage.getItem('pay-token');
+    const expired = localStorage.getItem('pay-expired');
+    if (token && expired && Date.parse(expired) > new Date().getMilliseconds()) {
+      config.headers.Authorization = `token ${token}`;
+    }
+
+    // json
+    if (data) {
+      config = {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'application/json',
+        },
+        data,
+      };
+    }
+    // form
+    if (form) {
+      config = {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        data: qs.stringify(form),
+      };
+    }
+    return inst
+      .request({ ...config, url, params: query })
+      .then((res: { data: any }) => {
+        if (res.data.code !== 200) {
+          const err = {
+            response: {
+              status: res.data.code,
+              statusText: res.data.message,
+            },
+          };
+          throw err;
+        } else if (res.data.message) {
+          notification.success({
+            message: `请求成功 ${res.data.code}`,
+            description: res.data.message,
+          });
+        }
+        return res.data.result;
+      })
+      .catch(onStatusError);
+  }
+
+  /**
+   * @description 接口传参校验
+   */
+  // eslint-disable-next-line
+  public check<V>(value: V, name: string) {
+    if (value === null || value === undefined) {
+      const msg = `[ERROR PARAMS]: ${name} can't be null or undefined`;
+      // 非生产环境，直接抛出错误
+      if (process.env.NODE_ENV === 'development') {
+        throw Error(msg);
+      }
+    }
+  }
+}
+
+export default new WrappedFetch();

@@ -85,7 +85,7 @@ export default {
       component: '../layouts/UserLayout',
       routes: [
         {
-          name: 'login',
+          name: '登录',
           path: '/user/login',
           component: './user/login',
         },
@@ -180,13 +180,11 @@ export default {
     basePath: '/',
   },
   chainWebpack: webpackPlugin,
-  /*
   proxy: {
-    '/server/api/': {
-      target: 'https://preview.pro.ant.design/',
+    '/api/': {
+      target: 'https://api.nai.ba/mock/33',
       changeOrigin: true,
-      pathRewrite: { '^/server': '' },
+      // pathRewrite: { '^/server': '' },
     },
   },
-  */
 } as IConfig;
