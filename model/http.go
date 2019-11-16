@@ -2,7 +2,7 @@ package model
 
 // Response ..
 type Response struct {
-	Code    uint        `json:"code,omitempty"`
+	Code    uint64        `json:"code,omitempty"`
 	Message string      `json:"message,omitempty"`
 	Result  interface{} `json:"result,omitempty"`
 }

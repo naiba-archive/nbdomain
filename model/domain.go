@@ -7,9 +7,9 @@ import (
 //Domain 域名
 type Domain struct {
 	Common
-	UserID      uint
-	CatID       uint
-	PanelID     uint
+	UserID      uint64
+	CatID       uint64
+	PanelID     uint64
 	Domain      string    `gorm:"type:varchar(100);unique_index"`
 	Create      time.Time //注册时间
 	Expire      time.Time //到期时间

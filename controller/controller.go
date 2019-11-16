@@ -62,14 +62,33 @@ func Web() {
 	api := r.Group("/api")
 	{
 		api.POST("login", user.Login)
-
 		authUser := api.Group("")
 		{
 			authUser.Use(mygin.Authorize(mygin.AuthOption{NeedUser: true}))
+			// 用户
 			authUser.GET("user", user.GET)
 			authUser.PUT("user", user.Settings)
-			authUser.GET("offers", panel.Offers)
+			// 米表
+			authUser.DELETE("panel/:id", panel.Delete)
+			authUser.GET("panel/:id/cats", panel.ListCats)
+			authUser.GET("panel/:id/domains", panel.ListDomains)
+			authUser.GET("panel/:id/export", panel.Export)
+			authUser.GET("panel", panel.List)
+			authUser.POST("panel", panel.Edit)
+			authUser.POST("batch", domain.Batch)
 			authUser.PUT("panel", panel.Edit)
+			// 分类
+			authUser.DELETE("cat/:id", cat.Delete)
+			authUser.PUT("cat", cat.Edit)
+			authUser.POST("cat", cat.Edit)
+			// 域名
+			authUser.POST("domain", domain.Edit)
+			authUser.PUT("domain", domain.Edit)
+			authUser.DELETE("domain/:id", domain.Delete)
+			// 销售
+			authUser.GET("offers", panel.Offers)
+			// 其他
+			authUser.GET("whois/:domain", whois.Whois)
 			authUser.GET("themes", func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{
 					"themes":       model.ThemeList,
@@ -79,20 +98,6 @@ func Web() {
 			authUser.GET("analysis_types", func(c *gin.Context) {
 				c.JSON(http.StatusOK, model.AnalysisTypes)
 			})
-			authUser.DELETE("panel/:id", panel.Delete)
-			authUser.GET("panel/:id/cats", panel.ListCats)
-			authUser.GET("panel/:id/domains", panel.ListDomains)
-			authUser.GET("panel/:id/export", panel.Export)
-			authUser.POST("panel", panel.Edit)
-			authUser.DELETE("cat/:id", cat.Delete)
-			authUser.PUT("cat", cat.Edit)
-			authUser.POST("cat", cat.Edit)
-			authUser.GET("panels", panel.List)
-			authUser.POST("batch", domain.Batch)
-			authUser.POST("domain", domain.Edit)
-			authUser.PUT("domain", domain.Edit)
-			authUser.DELETE("domain/:id", domain.Delete)
-			authUser.GET("whois/:domain", whois.Whois)
 		}
 	}
 	go r.Run(nbdomain.CF.Web.Addr)

@@ -71,11 +71,44 @@ func ListDomains(c *gin.Context) {
 	c.JSON(http.StatusOK, p.Domains)
 }
 
+type listPanelReq struct {
+	UserID     uint64 `form:"-"`
+	ID         uint64 `form:"id"`
+	Domain     string `form:"domain" binding:"min=3,max=63"`
+	Name       string `form:"name" binding:"min=1,max=20"`
+	NameEn     string `form:"name_en" binding:"min=1,max=40"`
+	Desc       string `form:"desc" binding:"min=1,max=255"`
+	DescEn     string `form:"desc_en" binding:"min=1,max=1000"`
+	Theme      string `form:"theme"`
+	OfferTheme string `form:"offer_theme"`
+}
+
 //List 米表列表
 func List(c *gin.Context) {
+	var lpr listPanelReq
+	if err := c.ShouldBindQuery(&lpr); err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
 	u := c.MustGet(mygin.KUser).(model.User)
-	nbdomain.DB.Model(&u).Related(&u.Panels)
-	c.JSON(http.StatusOK, u.Panels)
+	lpr.UserID = u.ID
+	var respList model.ListData
+	var ts []model.Panel
+	if err := model.AfterPagination(model.WhereQuery(nbdomain.DB.Model(model.Panel{}), lpr), model.BeforePagenation(c), &respList).Find(&ts).Error; err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+	respList.List = ts
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: respList,
+	})
 }
 
 //Delete 删除米表
@@ -95,7 +128,7 @@ func Delete(c *gin.Context) {
 //Edit 添加/修改米表
 func Edit(c *gin.Context) {
 	type PanelForm struct {
-		ID           uint   `form:"id"`
+		ID           uint64 `form:"id"`
 		Domain       string `form:"domain" binding:"required,min=3,max=63"`
 		Name         string `form:"name_cn" binding:"required,min=1,max=20"`
 		NameEn       string `form:"name_en" binding:"required,min=1,max=40"`

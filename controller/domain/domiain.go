@@ -25,23 +25,24 @@ func Delete(c *gin.Context) {
 	nbdomain.DB.Delete(&d)
 }
 
-//Batch 批量导入域名
-func Batch(c *gin.Context) {
-	type BatchForm struct {
-		PanelID uint `binding:"required,min=1"`
-		Cats    []struct {
-			Name    string `binding:"required,min=1,max=20"`
-			NameEn  string `binding:"required,min=1,max=30"`
-			Domains []struct {
-				Cost   int `binding:"min=1"` //购入成本
-				Buy    time.Time
-				Renew  int    `binding:"min=1"` //续费成本
-				Domain string `binding:"required,min=1,max=64"`
-				Desc   string `binding:"required,min=1,max=200"`
-			}
+type batchForm struct {
+	PanelID uint64 `binding:"required,min=1"`
+	Cats    []struct {
+		Name    string `binding:"required,min=1,max=20"`
+		NameEn  string `binding:"required,min=1,max=30"`
+		Domains []struct {
+			Cost   int `binding:"min=1"` //购入成本
+			Buy    time.Time
+			Renew  int    `binding:"min=1"` //续费成本
+			Domain string `binding:"required,min=1,max=64"`
+			Desc   string `binding:"required,min=1,max=200"`
 		}
 	}
-	var bf BatchForm
+}
+
+//Batch 批量导入域名
+func Batch(c *gin.Context) {
+	var bf batchForm
 	if err := c.ShouldBind(&bf); err != nil {
 		log.Println(err)
 		c.String(http.StatusForbidden, "输入数据不符合规范。可留空但不可以乱填。")
@@ -100,9 +101,9 @@ func Batch(c *gin.Context) {
 //Edit 添加/修改域名
 func Edit(c *gin.Context) {
 	type EditForm struct {
-		CatID     uint `binding:"required,min=1"`
-		PanelID   uint `binding:"required,min=1"`
-		ID        uint
+		CatID     uint64 `binding:"required,min=1"`
+		PanelID   uint64 `binding:"required,min=1"`
+		ID        uint64
 		Create    time.Time //注册时间
 		Expire    time.Time //到期时间
 		Cost      int       `binding:"min=1"` //购入成本

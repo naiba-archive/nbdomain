@@ -8,7 +8,7 @@ type Offer struct {
 	Mail     string
 	Amount   int
 	Domain   string
-	UserID   uint
+	UserID   uint64
 
 	User User `json:",omitempty"`
 }

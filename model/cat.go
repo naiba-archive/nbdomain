@@ -3,8 +3,8 @@ package model
 //Cat 分类
 type Cat struct {
 	Common
-	PanelID uint
-	UserID  uint
+	PanelID uint64
+	UserID  uint64
 	Name    string
 	NameEn  string
 	Index   int

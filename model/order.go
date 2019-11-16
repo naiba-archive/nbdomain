@@ -4,7 +4,7 @@ package model
 type Order struct {
 	Common
 	What   string
-	UserID uint
+	UserID uint64
 	Finish bool
 
 	User User `json:",omitempty"`

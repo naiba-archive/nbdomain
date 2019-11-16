@@ -27,20 +27,20 @@ var AnalysisTypes = map[string]string{
 //Panel 米表
 type Panel struct {
 	Common
-	UserID       uint
-	Domain       string `gorm:"type:varchar(100);unique_index"`
-	Name         string
-	NameEn       string
-	Desc         string
-	DescEn       string
-	AnalysisType string
-	Analysis     string
-	Theme        string
-	OfferTheme   string
+	UserID       uint64 `json:"user_id,omitempty"`
+	Domain       string `gorm:"type:varchar(100);unique_index" json:"domain,omitempty"`
+	Name         string `json:"name,omitempty"`
+	NameEn       string `json:"name_en,omitempty"`
+	Desc         string `json:"desc,omitempty"`
+	DescEn       string `json:"desc_en,omitempty"`
+	AnalysisType string `json:"analysis_type,omitempty"`
+	Analysis     string `json:"analysis,omitempty"`
+	Theme        string `json:"theme,omitempty"`
+	OfferTheme   string `json:"offer_theme,omitempty"`
 
-	User    User     `json:",omitempty"`
-	Cats    []Cat    `json:",omitempty"`
-	Domains []Domain `json:",omitempty"`
+	User    User     `json:"-"`
+	Cats    []Cat    `json:"cats,omitempty"`
+	Domains []Domain `json:"domains,omitempty"`
 }
 
 //SID 字符串ID

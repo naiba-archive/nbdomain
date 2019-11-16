@@ -27,8 +27,8 @@ func Delete(c *gin.Context) {
 //Edit 修改或添加分类
 func Edit(c *gin.Context) {
 	type EditForm struct {
-		PanelID uint   `json:"pid" binding:"required"`
-		ID      uint   `json:"id"`
+		PanelID uint64   `json:"pid" binding:"required"`
+		ID      uint64   `json:"id"`
 		Name    string `json:"name" binding:"required,min=1,max=20"`
 		NameEn  string `json:"name_en" binding:"required,min=1,max=30"`
 		Index   int    `json:"index"`
