@@ -253,12 +253,16 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
-  handleAdd = (fields: { desc: any }) => {
+  handleAdd = (fields: any) => {
     const { dispatch } = this.props;
     dispatch({
       type: 'panel/add',
-      payload: {
-        desc: fields.desc,
+      payload: fields,
+      callback: () => {
+        dispatch({
+          type: 'panel/fetch',
+          payload: this.state.formValues,
+        });
       },
     });
 

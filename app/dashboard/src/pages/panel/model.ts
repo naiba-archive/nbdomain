@@ -57,7 +57,7 @@ const Model: ModelType = {
       });
     },
     *add({ payload, callback }, { call, put }) {
-      const response = yield call(null, payload);
+      const response = yield call(APIS.DefaultApi.panelPost, payload);
       yield put({
         type: 'save',
         payload: response,

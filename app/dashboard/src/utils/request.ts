@@ -1,5 +1,4 @@
 import axios, { AxiosError } from 'axios';
-import qs from 'qs';
 import { notification } from 'antd';
 
 const inst = axios.create({
@@ -56,7 +55,11 @@ export class WrappedFetch {
    * @description ajax 方法
    */
   // eslint-disable-next-line
-  public async ajax({ method, url, data, form, query, header, extra }: WrappedFetchParams) {
+  public async ajax(
+    { method, url, data, form, query, header, extra }: WrappedFetchParams,
+    path?: string,
+    basePath?: string,
+  ) {
     let config = {
       ...extra,
       method: method.toLocaleLowerCase(),
@@ -83,13 +86,17 @@ export class WrappedFetch {
     }
     // form
     if (form) {
+      const postData = new FormData();
+      Object.keys(form).forEach(k => {
+        postData.append(k, form[k]);
+      });
       config = {
         ...config,
         headers: {
           ...config.headers,
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        data: qs.stringify(form),
+        data: postData,
       };
     }
     return inst
@@ -102,6 +109,7 @@ export class WrappedFetch {
               statusText: res.data.message,
             },
           };
+          console.debug('ajax', path, basePath);
           throw err;
         } else if (res.data.message) {
           notification.success({

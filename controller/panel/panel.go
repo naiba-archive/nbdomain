@@ -2,7 +2,7 @@ package panel
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -125,38 +125,51 @@ func Delete(c *gin.Context) {
 	nbdomain.DB.Delete(&p)
 }
 
+type panelForm struct {
+	ID           uint64 `form:"id"`
+	Domain       string `form:"domain" binding:"required,min=3,max=63"`
+	Name         string `form:"name" binding:"required,min=1,max=20"`
+	NameEn       string `form:"name_en" binding:"required,min=1,max=40"`
+	Desc         string `form:"desc" binding:"required,min=1,max=255"`
+	DescEn       string `form:"desc_en" binding:"required,min=1,max=1000"`
+	Theme        string `form:"theme" binding:"required"`
+	OfferTheme   string `form:"offer_theme" binding:"required"`
+	Analysis     string `form:"analysis" binding:"max=20"`
+	AnalysisType string `form:"analysis_type"`
+}
+
 //Edit 添加/修改米表
 func Edit(c *gin.Context) {
-	type PanelForm struct {
-		ID           uint64 `form:"id"`
-		Domain       string `form:"domain" binding:"required,min=3,max=63"`
-		Name         string `form:"name_cn" binding:"required,min=1,max=20"`
-		NameEn       string `form:"name_en" binding:"required,min=1,max=40"`
-		Desc         string `form:"desc_cn" binding:"required,min=1,max=255"`
-		DescEn       string `form:"desc_en" binding:"required,min=1,max=1000"`
-		Theme        string `form:"theme" binding:"required"`
-		OfferTheme   string `form:"offer_theme" binding:"required"`
-		Analysis     string `form:"analysis" binding:"max=20"`
-		AnalysisType string `form:"analysis_type"`
-	}
-	var pf PanelForm
+	var r model.Response
+	var pf panelForm
 	if e := c.ShouldBind(&pf); e != nil {
-		log.Println(e)
-		c.String(http.StatusForbidden, "输入数据不符合规范。")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("输入数据不符合规范：%s", e.Error()),
+		})
 		return
 	}
 	if pf.AnalysisType != "" {
 		if _, has := model.AnalysisTypes[pf.AnalysisType]; !has {
-			c.String(http.StatusForbidden, "米表统计类型不存在")
+			c.JSON(http.StatusOK, model.Response{
+				Code:    http.StatusBadRequest,
+				Message: "米表统计类型不存在",
+			})
 			return
 		}
 	}
 	if _, has := model.ThemeList[pf.Theme]; !has {
-		c.String(http.StatusForbidden, "主题不存在")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "主题不存在",
+		})
 		return
 	}
 	if len(pf.Domain) < 4 {
-		c.String(http.StatusForbidden, "域名格式不符合规范")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "域名格式不符合规范",
+		})
 		return
 	}
 
@@ -166,7 +179,10 @@ func Edit(c *gin.Context) {
 	var p model.Panel
 	if c.Request.Method == http.MethodPut {
 		if nbdomain.DB.Where("id = ? AND user_id = ?", pf.ID, u.ID).First(&p).Error != nil {
-			c.String(http.StatusForbidden, "米表不存在")
+			c.JSON(http.StatusOK, model.Response{
+				Code:    http.StatusBadRequest,
+				Message: "米表不存在",
+			})
 			return
 		}
 	}
@@ -192,14 +208,20 @@ func Edit(c *gin.Context) {
 		}
 		return f, nil, true
 	}
-	flogo, e, blogo := checkLogo("logo_cn")
+	flogo, e, blogo := checkLogo("logo")
 	if !blogo && e != nil {
-		c.String(http.StatusForbidden, e.Error())
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),
+		})
 		return
 	}
 	flogoEn, e, blogoEn := checkLogo("logo_en")
 	if !blogo && e != nil {
-		c.String(http.StatusForbidden, e.Error())
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),
+		})
 		return
 	}
 	// 数据入库
@@ -222,8 +244,10 @@ func Edit(c *gin.Context) {
 		err = nbdomain.DB.Model(&p).Update(p).Error
 	}
 	if err != nil {
-		log.Println(err)
-		c.String(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("数据库错误：%s", err.Error()),
+		})
 		return
 	}
 	if blogo {
@@ -232,5 +256,7 @@ func Edit(c *gin.Context) {
 	if blogoEn {
 		saveLogo(flogoEn, "logo_en")
 	}
-	c.JSON(http.StatusOK, p)
+	r.Code = http.StatusOK
+	r.Message = "添加成功"
+	c.JSON(http.StatusOK, r)
 }
