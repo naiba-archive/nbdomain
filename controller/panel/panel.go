@@ -74,11 +74,11 @@ func ListDomains(c *gin.Context) {
 type listPanelReq struct {
 	UserID     uint64 `form:"-"`
 	ID         uint64 `form:"id"`
-	Domain     string `form:"domain" binding:"min=3,max=63"`
-	Name       string `form:"name" binding:"min=1,max=20"`
-	NameEn     string `form:"name_en" binding:"min=1,max=40"`
-	Desc       string `form:"desc" binding:"min=1,max=255"`
-	DescEn     string `form:"desc_en" binding:"min=1,max=1000"`
+	Domain     string `form:"domain"`
+	Name       string `form:"name"`
+	NameEn     string `form:"name_en"`
+	Desc       string `form:"desc"`
+	DescEn     string `form:"desc_en"`
 	Theme      string `form:"theme"`
 	OfferTheme string `form:"offer_theme"`
 }
@@ -136,8 +136,8 @@ func Edit(c *gin.Context) {
 		DescEn       string `form:"desc_en" binding:"required,min=1,max=1000"`
 		Theme        string `form:"theme" binding:"required"`
 		OfferTheme   string `form:"offer_theme" binding:"required"`
-		Analysis     string `form:"ga" binding:"max=20"`
-		AnalysisType string `form:"at"`
+		Analysis     string `form:"analysis" binding:"max=20"`
+		AnalysisType string `form:"analysis_type"`
 	}
 	var pf PanelForm
 	if e := c.ShouldBind(&pf); e != nil {

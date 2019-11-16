@@ -88,16 +88,17 @@ func Web() {
 			// 销售
 			authUser.GET("offers", panel.Offers)
 			// 其他
+			authUser.GET("panel_option", func(c *gin.Context) {
+				var r model.Response
+				r.Code = http.StatusOK
+				r.Result = gin.H{
+					"themes":         model.ThemeList,
+					"offer_themes":   model.OfferThemeList,
+					"analysis_types": model.AnalysisTypes,
+				}
+				c.JSON(http.StatusOK, r)
+			})
 			authUser.GET("whois/:domain", whois.Whois)
-			authUser.GET("themes", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{
-					"themes":       model.ThemeList,
-					"offer_themes": model.OfferThemeList,
-				})
-			})
-			authUser.GET("analysis_types", func(c *gin.Context) {
-				c.JSON(http.StatusOK, model.AnalysisTypes)
-			})
 		}
 	}
 	go r.Run(nbdomain.CF.Web.Addr)

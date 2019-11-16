@@ -64,7 +64,7 @@ const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] =>
     return Authorized.check(item.authority, localItem, null) as MenuDataItem;
   });
 
-const defaultFooterDom = <DefaultFooter copyright="2019 奶爸米表" links={[]} />;
+const defaultFooterDom = <DefaultFooter copyright="2019 域名管理平台 ❤️奶爸" links={[]} />;
 
 const footerRender: BasicLayoutProps['footerRender'] = () => defaultFooterDom;
 

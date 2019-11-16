@@ -5,7 +5,8 @@ import { TableListData } from './data.d';
 import { APIS } from '@/services';
 
 export interface StateType {
-  data: TableListData;
+  data?: TableListData;
+  panelOptions?: any;
 }
 
 export type Effect = (
@@ -18,12 +19,14 @@ export interface ModelType {
   state: StateType;
   effects: {
     fetch: Effect;
+    fetchOptions: Effect;
     add: Effect;
     remove: Effect;
     update: Effect;
   };
   reducers: {
     save: Reducer<StateType>;
+    saveOptions: Reducer<StateType>;
   };
 }
 
@@ -35,6 +38,7 @@ const Model: ModelType = {
       list: [],
       pagination: {},
     },
+    panelOptions: {},
   },
 
   effects: {
@@ -42,6 +46,13 @@ const Model: ModelType = {
       const response = yield call(APIS.DefaultApi.panelGet, payload);
       yield put({
         type: 'save',
+        payload: response,
+      });
+    },
+    *fetchOptions({ payload }, { call, put }) {
+      const response = yield call(APIS.DefaultApi.panelOptionGet, payload);
+      yield put({
+        type: 'saveOptions',
         payload: response,
       });
     },
@@ -76,6 +87,12 @@ const Model: ModelType = {
       return {
         ...state,
         data: action.payload,
+      };
+    },
+    saveOptions(state, action) {
+      return {
+        ...state,
+        panelOptions: action.payload,
       };
     },
   },

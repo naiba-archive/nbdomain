@@ -9,7 +9,7 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export interface StandardTableProps<T> extends Omit<TableProps<T>, 'columns'> {
   columns: StandardTableColumnProps[];
-  data: {
+  data?: {
     list: TableListItem[];
     pagination: StandardTableProps<TableListItem>['pagination'];
   };

@@ -48,7 +48,6 @@ class UpdateForm extends Component<UpdateFormProps, UpdateFormState> {
       formVals: {
         name: props.values.name,
         desc: props.values.desc,
-        key: props.values.key,
         target: '0',
         template: '0',
         type: '1',
@@ -108,17 +107,17 @@ class UpdateForm extends Component<UpdateFormProps, UpdateFormState> {
             </Select>,
           )}
         </FormItem>,
-        <FormItem key="template" {...this.formLayout} label="规则模板">
+        <FormItem key="template" {...this.formLayout} label="米表模板">
           {form.getFieldDecorator('template', {
             initialValue: formVals.template,
           })(
             <Select style={{ width: '100%' }}>
-              <Option value="0">规则模板一</Option>
-              <Option value="1">规则模板二</Option>
+              <Option value="0">米表模板一</Option>
+              <Option value="1">米表模板二</Option>
             </Select>,
           )}
         </FormItem>,
-        <FormItem key="type" {...this.formLayout} label="规则类型">
+        <FormItem key="type" {...this.formLayout} label="米表类型">
           {form.getFieldDecorator('type', {
             initialValue: formVals.type,
           })(
@@ -157,15 +156,15 @@ class UpdateForm extends Component<UpdateFormProps, UpdateFormState> {
       ];
     }
     return [
-      <FormItem key="name" {...this.formLayout} label="规则名称">
+      <FormItem key="name" {...this.formLayout} label="米表名称">
         {form.getFieldDecorator('name', {
-          rules: [{ required: true, message: '请输入规则名称！' }],
+          rules: [{ required: true, message: '请输入米表名称！' }],
           initialValue: formVals.name,
         })(<Input placeholder="请输入" />)}
       </FormItem>,
-      <FormItem key="desc" {...this.formLayout} label="规则描述">
+      <FormItem key="desc" {...this.formLayout} label="米表描述">
         {form.getFieldDecorator('desc', {
-          rules: [{ required: true, message: '请输入至少五个字符的规则描述！', min: 5 }],
+          rules: [{ required: true, message: '请输入至少五个字符的米表描述！', min: 5 }],
           initialValue: formVals.desc,
         })(<TextArea rows={4} placeholder="请输入至少五个字符" />)}
       </FormItem>,
@@ -219,7 +218,7 @@ class UpdateForm extends Component<UpdateFormProps, UpdateFormState> {
         width={640}
         bodyStyle={{ padding: '32px 40px 48px' }}
         destroyOnClose
-        title="规则配置"
+        title="米表配置"
         visible={updateModalVisible}
         footer={this.renderFooter(currentStep)}
         onCancel={() => handleUpdateModalVisible(false, values)}
@@ -227,7 +226,7 @@ class UpdateForm extends Component<UpdateFormProps, UpdateFormState> {
       >
         <Steps style={{ marginBottom: 28 }} size="small" current={currentStep}>
           <Step title="基本信息" />
-          <Step title="配置规则属性" />
+          <Step title="配置米表属性" />
           <Step title="设定调度周期" />
         </Steps>
         {this.renderContent(currentStep, formVals)}

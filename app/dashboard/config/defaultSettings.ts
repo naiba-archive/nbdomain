@@ -54,7 +54,7 @@ export default {
   menu: {
     locale: false,
   },
-  title: '奶爸米表',
+  title: '域名管理平台',
   pwa: false,
   iconfontUrl: '',
 } as DefaultSettings;

@@ -37,7 +37,7 @@ const getValue = (obj: { [x: string]: string[] }) =>
     .join(',');
 
 interface TableListProps extends FormComponentProps {
-  dispatch: Dispatch<Action<'panel/add' | 'panel/fetch' | 'panel/remove' | 'panel/update'>>;
+  dispatch: Dispatch<Action>;
   loading: boolean;
   panel: StateType;
 }
@@ -131,6 +131,10 @@ class TableList extends Component<TableListProps, TableListState> {
       type: 'panel/fetch',
       payload: formValues,
     });
+
+    dispatch({
+      type: 'panel/fetchOptions',
+    });
   }
 
   handleStandardTableChange = (
@@ -192,7 +196,7 @@ class TableList extends Component<TableListProps, TableListState> {
         dispatch({
           type: 'panel/remove',
           payload: {
-            key: selectedRows.map(row => row.key),
+            key: selectedRows.map(row => row.id),
           },
           callback: () => {
             this.setState({
@@ -269,7 +273,6 @@ class TableList extends Component<TableListProps, TableListState> {
       payload: {
         name: fields.name,
         desc: fields.desc,
-        key: fields.key,
       },
     });
 
@@ -284,7 +287,7 @@ class TableList extends Component<TableListProps, TableListState> {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则名称">
+            <FormItem label="米表名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -324,7 +327,7 @@ class TableList extends Component<TableListProps, TableListState> {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="规则名称">
+            <FormItem label="米表名称">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
@@ -397,7 +400,7 @@ class TableList extends Component<TableListProps, TableListState> {
 
   render() {
     const {
-      panel: { data },
+      panel: { data, panelOptions },
       loading,
     } = this.props;
 
@@ -447,7 +450,7 @@ class TableList extends Component<TableListProps, TableListState> {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
+        <CreateForm {...parentMethods} panelOptions={panelOptions} modalVisible={modalVisible} />
         {stepFormValues && Object.keys(stepFormValues).length ? (
           <UpdateForm
             {...updateMethods}
