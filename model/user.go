@@ -12,6 +12,7 @@ import (
 //User model
 type User struct {
 	Common
+	Avatar      string    `gorm:"-" json:"avatar"`
 	Mail        string    `gorm:"type:varchar(50);unique_index" json:"mail,omitempty"`
 	Password    string    `json:"-"`
 	IsAdmin     bool      `json:"is_admin,omitempty"`
@@ -26,6 +27,14 @@ type User struct {
 	Panels  []Panel  `json:"panels,omitempty"`
 	Cats    []Cat    `json:"cats,omitempty"`
 	Offers  []Offer  `json:"offers,omitempty"`
+}
+
+// AfterFind ..
+func (u *User) AfterFind() {
+	u.Avatar = "https://gravatar.loli.net/avatar/" + com.MD5(u.Mail)
+	if u.Name == "" {
+		u.Name = "管理员"
+	}
 }
 
 //GenerateToken 生成用户Token

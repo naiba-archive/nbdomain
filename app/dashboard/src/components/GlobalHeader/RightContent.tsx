@@ -30,11 +30,9 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = props => {
         placeholder={formatMessage({
           id: 'component.globalHeader.search',
         })}
-        defaultValue="umi ui"
+        defaultValue=""
         dataSource={[
-          formatMessage({
-            id: 'component.globalHeader.search.example1',
-          }),
+          '功能暂未实现',
           formatMessage({
             id: 'component.globalHeader.search.example2',
           }),
@@ -49,14 +47,10 @@ const GlobalHeaderRight: React.SFC<GlobalHeaderRightProps> = props => {
           console.log('enter', value);
         }}
       />
-      <Tooltip
-        title={formatMessage({
-          id: 'component.globalHeader.help',
-        })}
-      >
+      <Tooltip title="产品反馈">
         <a
           target="_blank"
-          href="https://pro.ant.design/docs/getting-started"
+          href="https://support.qq.com/products/99195"
           rel="noopener noreferrer"
           className={styles.action}
         >
