@@ -116,9 +116,6 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
     const rowSelection: TableRowSelection<TableListItem> = {
       selectedRowKeys,
       onChange: this.handleRowSelectChange,
-      getCheckboxProps: (record: TableListItem) => ({
-        disabled: record,
-      }),
     };
 
     return (

@@ -88,7 +88,7 @@ export class WrappedFetch {
     if (form) {
       const postData = new FormData();
       Object.keys(form).forEach(k => {
-        postData.append(k, form[k]);
+        if (form[k]) postData.append(k, form[k]);
       });
       config = {
         ...config,

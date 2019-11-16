@@ -88,20 +88,20 @@ class TableList extends Component<TableListProps, TableListState> {
       dataIndex: 'domain',
     },
     {
-      title: '米表主题',
-      dataIndex: 'theme',
-    },
-    {
-      title: '报价页主题',
-      dataIndex: 'offer_theme',
-    },
-    {
       title: '标题[中]',
       dataIndex: 'name',
     },
     {
       title: '标题[英]',
       dataIndex: 'name_en',
+    },
+    {
+      title: '米表主题',
+      dataIndex: 'theme',
+    },
+    {
+      title: '报价页主题',
+      dataIndex: 'offer_theme',
     },
     {
       title: '简介[中]',
@@ -445,6 +445,7 @@ class TableList extends Component<TableListProps, TableListState> {
               )}
             </div>
             <StandardTable
+              rowKey="id"
               selectedRows={selectedRows}
               loading={loading}
               data={data}

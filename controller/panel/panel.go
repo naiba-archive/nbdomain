@@ -217,7 +217,7 @@ func Edit(c *gin.Context) {
 		return
 	}
 	flogoEn, e, blogoEn := checkLogo("logo_en")
-	if !blogo && e != nil {
+	if !blogoEn && e != nil {
 		c.JSON(http.StatusOK, model.Response{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),
