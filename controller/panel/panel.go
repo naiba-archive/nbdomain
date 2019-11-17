@@ -208,16 +208,18 @@ func Edit(c *gin.Context) {
 		}
 		return f, nil, true
 	}
+
 	flogo, e, blogo := checkLogo("logo")
-	if !blogo && e != nil {
+	if !blogo && e != nil && pf.ID != 0 {
 		c.JSON(http.StatusOK, model.Response{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),
 		})
 		return
 	}
+
 	flogoEn, e, blogoEn := checkLogo("logo_en")
-	if !blogoEn && e != nil {
+	if !blogoEn && e != nil && pf.ID != 0 {
 		c.JSON(http.StatusOK, model.Response{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),

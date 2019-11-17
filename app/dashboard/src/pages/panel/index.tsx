@@ -1,19 +1,4 @@
-import {
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Divider,
-  Dropdown,
-  Form,
-  Icon,
-  Input,
-  InputNumber,
-  Menu,
-  Row,
-  Select,
-  message,
-} from 'antd';
+import { Button, Card, Col, Divider, Form, Input, Row, Select, message } from 'antd';
 import React, { Component, Fragment } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -24,7 +9,6 @@ import { connect } from 'dva';
 import { StateType } from './model';
 import CreateForm from './components/CreateForm';
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem, TableListPagination, TableListParams } from './data.d';
 
 import styles from './style.less';
@@ -44,8 +28,8 @@ interface TableListProps extends FormComponentProps {
 
 interface TableListState {
   modalVisible: boolean;
-  updateModalVisible: boolean;
-  expandForm: boolean;
+  isEdit: boolean;
+  currentRow: any;
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
   stepFormValues: Partial<TableListItem>;
@@ -71,11 +55,10 @@ interface TableListState {
 class TableList extends Component<TableListProps, TableListState> {
   state: TableListState = {
     modalVisible: false,
-    updateModalVisible: false,
-    expandForm: false,
+    isEdit: false,
+    currentRow: {},
     selectedRows: [],
     formValues: {},
-    stepFormValues: {},
   };
 
   columns: StandardTableColumnProps[] = [
@@ -112,12 +95,29 @@ class TableList extends Component<TableListProps, TableListState> {
       dataIndex: 'desc_en',
     },
     {
-      title: '操作',
+      title: '管理操作',
       render: (text, record) => (
         <Fragment>
-          <a onClick={() => this.handleUpdateModalVisible(true, record)}>配置</a>
+          <a
+            onClick={() =>
+              this.setState(prevState => ({
+                ...prevState,
+                currentRow: record,
+                isEdit: true,
+                modalVisible: true,
+              }))
+            }
+          >
+            修改
+          </a>
           <Divider type="vertical" />
-          <a href="">订阅警报</a>
+          <a href="">分类</a>
+          <Divider type="vertical" />
+          <a href="">域名</a>
+          <Divider type="vertical" />
+          <a href="">导入</a>
+          <Divider type="vertical" />
+          <a href="">删除</a>
         </Fragment>
       ),
     },
@@ -179,37 +179,6 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
-  toggleForm = () => {
-    const { expandForm } = this.state;
-    this.setState({
-      expandForm: !expandForm,
-    });
-  };
-
-  handleMenuClick = (e: { key: string }) => {
-    const { dispatch } = this.props;
-    const { selectedRows } = this.state;
-
-    if (!selectedRows) return;
-    switch (e.key) {
-      case 'remove':
-        dispatch({
-          type: 'panel/remove',
-          payload: {
-            key: selectedRows.map(row => row.id),
-          },
-          callback: () => {
-            this.setState({
-              selectedRows: [],
-            });
-          },
-        });
-        break;
-      default:
-        break;
-    }
-  };
-
   handleSelectRows = (rows: TableListItem[]) => {
     this.setState({
       selectedRows: rows,
@@ -243,17 +212,12 @@ class TableList extends Component<TableListProps, TableListState> {
   handleModalVisible = (flag?: boolean) => {
     this.setState({
       modalVisible: !!flag,
+      currentRow: {},
+      isEdit: false,
     });
   };
 
-  handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
-    });
-  };
-
-  handleAdd = (fields: any) => {
+  handleAdd = (fields: any, isEdit: boolean) => {
     const { dispatch } = this.props;
     dispatch({
       type: 'panel/add',
@@ -266,22 +230,8 @@ class TableList extends Component<TableListProps, TableListState> {
       },
     });
 
-    message.success('添加成功');
+    message.success(`${isEdit ? '修改' : '添加'}成功`);
     this.handleModalVisible();
-  };
-
-  handleUpdate = (fields: FormValueType) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'panel/update',
-      payload: {
-        name: fields.name,
-        desc: fields.desc,
-      },
-    });
-
-    message.success('配置成功');
-    this.handleUpdateModalVisible();
   };
 
   renderSimpleForm() {
@@ -313,93 +263,11 @@ class TableList extends Component<TableListProps, TableListState> {
               <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
                 重置
               </Button>
-              <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-                展开 <Icon type="down" />
-              </a>
             </span>
           </Col>
         </Row>
       </Form>
     );
-  }
-
-  renderAdvancedForm() {
-    const {
-      form: { getFieldDecorator },
-    } = this.props;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="米表名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="调用次数">
-              {getFieldDecorator('number')(<InputNumber style={{ width: '100%' }} />)}
-            </FormItem>
-          </Col>
-        </Row>
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
-            <FormItem label="更新日期">
-              {getFieldDecorator('date')(
-                <DatePicker style={{ width: '100%' }} placeholder="请输入更新日期" />,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status3')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status4')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
-            </FormItem>
-          </Col>
-        </Row>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ float: 'right', marginBottom: 24 }}>
-            <Button type="primary" htmlType="submit">
-              查询
-            </Button>
-            <Button style={{ marginLeft: 8 }} onClick={this.handleFormReset}>
-              重置
-            </Button>
-            <a style={{ marginLeft: 8 }} onClick={this.toggleForm}>
-              收起 <Icon type="up" />
-            </a>
-          </div>
-        </div>
-      </Form>
-    );
-  }
-
-  renderForm() {
-    const { expandForm } = this.state;
-    return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
   render() {
@@ -408,41 +276,22 @@ class TableList extends Component<TableListProps, TableListState> {
       loading,
     } = this.props;
 
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
-    const menu = (
-      <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
-        <Menu.Item key="remove">删除</Menu.Item>
-        <Menu.Item key="approval">批量审批</Menu.Item>
-      </Menu>
-    );
+    const { selectedRows, modalVisible, isEdit, currentRow } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
       handleModalVisible: this.handleModalVisible,
     };
-    const updateMethods = {
-      handleUpdateModalVisible: this.handleUpdateModalVisible,
-      handleUpdate: this.handleUpdate,
-    };
+
     return (
       <PageHeaderWrapper>
         <Card bordered={false}>
           <div className={styles.tableList}>
-            <div className={styles.tableListForm}>{this.renderForm()}</div>
+            <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <div className={styles.tableListOperator}>
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
                 新建
               </Button>
-              {selectedRows.length > 0 && (
-                <span>
-                  <Button>批量操作</Button>
-                  <Dropdown overlay={menu}>
-                    <Button>
-                      更多操作 <Icon type="down" />
-                    </Button>
-                  </Dropdown>
-                </span>
-              )}
             </div>
             <StandardTable
               rowKey="id"
@@ -455,14 +304,13 @@ class TableList extends Component<TableListProps, TableListState> {
             />
           </div>
         </Card>
-        <CreateForm {...parentMethods} panelOptions={panelOptions} modalVisible={modalVisible} />
-        {stepFormValues && Object.keys(stepFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={stepFormValues}
-          />
-        ) : null}
+        <CreateForm
+          {...parentMethods}
+          currentRow={currentRow}
+          isEdit={isEdit}
+          panelOptions={panelOptions}
+          modalVisible={modalVisible}
+        />
       </PageHeaderWrapper>
     );
   }
