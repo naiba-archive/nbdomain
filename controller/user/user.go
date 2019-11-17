@@ -2,7 +2,6 @@ package user
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -92,18 +91,21 @@ func Login(c *gin.Context) {
 }
 
 type settingForm struct {
-	Name   string `binding:"required,min=2,max=12"`
-	Phone  string `binding:"required,min=2,max=20"`
-	Weixin string `binding:"required,min=2,max=20"`
-	QQ     string `binding:"required,min=2,max=20"`
+	Name     string `binding:"omitempty,min=2,max=12" json:"name,omitempty"`
+	Phone    string `binding:"omitempty,min=2,max=20" json:"phone,omitempty"`
+	Weixin   string `binding:"omitempty,min=2,max=20" json:"weixin,omitempty"`
+	QQ       string `binding:"omitempty,min=2,max=20" json:"qq,omitempty"`
+	Password string `binding:"omitempty,min=6" json:"password,omitempty"`
 }
 
 //Settings 个人设置
 func Settings(c *gin.Context) {
 	var lf settingForm
 	if err := c.ShouldBind(&lf); err != nil {
-		log.Println(err)
-		c.String(http.StatusBadRequest, "您的输入不符合规范，请检查后重试")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("输入数据不符合规范：%s", err.Error()),
+		})
 		return
 	}
 	u := c.MustGet(mygin.KUser).(model.User)
@@ -111,16 +113,28 @@ func Settings(c *gin.Context) {
 	u.QQ = lf.QQ
 	u.Phone = lf.Phone
 	u.Name = lf.Name
-	var err error
-	if c.Request.Method == http.MethodPost {
-		err = nbdomain.DB.Save(&u).Error
-	} else {
-		err = nbdomain.DB.Model(&u).Update(u).Error
+	if lf.Password != "" {
+		pass, err := bcrypt.GenerateFromPassword([]byte(lf.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusOK, model.Response{
+				Code:    http.StatusInternalServerError,
+				Message: fmt.Sprintf("密码生成错误：%s", err),
+			})
+			return
+		}
+		u.Password = string(pass)
 	}
+	var err error
+	err = nbdomain.DB.Model(&u).Update(u).Error
 	if err != nil {
-		log.Println("database error", err.Error())
-		c.String(http.StatusInternalServerError, "服务器错误：数据库错误。")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("服务器错误：%s", err),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, u)
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: u.ID,
+	})
 }

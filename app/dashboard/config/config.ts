@@ -126,6 +126,12 @@ export default {
               component: './offer',
             },
             {
+              name: 'setting',
+              icon: 'setting',
+              path: '/setting',
+              component: './setting',
+            },
+            {
               component: './404',
             },
           ],

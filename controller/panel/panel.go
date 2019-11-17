@@ -172,7 +172,7 @@ func Edit(c *gin.Context) {
 	checkLogo := func(name string) (*multipart.FileHeader, error, bool) {
 		f, err := c.FormFile(name)
 		if err != nil {
-			if c.Request.Method == http.MethodPut {
+			if pf.ID != 0 {
 				return f, nil, false
 			}
 			return f, errors.New("上传文件获取失败。"), false
@@ -202,7 +202,7 @@ func Edit(c *gin.Context) {
 		return
 	}
 	// 数据入库
-	if c.Request.Method == http.MethodPost {
+	if pf.ID == 0 {
 		p.UserID = u.ID
 	}
 	p.Name = pf.Name
@@ -215,7 +215,7 @@ func Edit(c *gin.Context) {
 	p.Analysis = pf.Analysis
 	p.AnalysisType = pf.AnalysisType
 	var err error
-	if c.Request.Method == http.MethodPost {
+	if pf.ID == 0 {
 		err = nbdomain.DB.Save(&p).Error
 	} else {
 		err = nbdomain.DB.Model(&p).Update(p).Error

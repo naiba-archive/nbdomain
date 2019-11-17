@@ -109,7 +109,7 @@ func Edit(c *gin.Context) {
 	cat.PanelID = p.ID
 	cat.Index = ef.Index
 	var err error
-	if c.Request.Method == http.MethodPost {
+	if ef.ID == 0 {
 		err = nbdomain.DB.Save(&cat).Error
 	} else {
 		err = nbdomain.DB.Model(&cat).Update(cat).Error

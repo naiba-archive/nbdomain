@@ -212,7 +212,7 @@ func Edit(c *gin.Context) {
 	d.Registrar = ef.Registrar
 
 	var err error
-	if c.Request.Method == http.MethodPost {
+	if ef.ID == 0 {
 		err = nbdomain.DB.Save(&d).Error
 	} else {
 		err = nbdomain.DB.Model(&d).Update(d).Error

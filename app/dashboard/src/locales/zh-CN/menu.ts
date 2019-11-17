@@ -2,6 +2,7 @@ export default {
   'menu.home': '首页',
   'menu.panel': '米表管理',
   'menu.cat': '分类管理',
+  'menu.setting': '个人设置',
   'menu.domain': '域名管理',
   'menu.offer': '报价管理',
   'menu.login': '登录',
