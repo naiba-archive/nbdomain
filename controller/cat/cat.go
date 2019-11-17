@@ -52,11 +52,18 @@ func Delete(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(model.User)
 	var cat model.Cat
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, id).First(&cat).Error != nil {
-		c.String(http.StatusForbidden, "分类不存在。")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "分类不存在。",
+		})
 		return
 	}
 	nbdomain.DB.Where("cat_id = ?", id).Delete(&model.Domain{})
 	nbdomain.DB.Delete(&cat)
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: id,
+	})
 }
 
 type editForm struct {

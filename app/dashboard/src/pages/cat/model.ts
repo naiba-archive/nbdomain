@@ -56,7 +56,7 @@ const Model: ModelType = {
       if (callback && response) callback();
     },
     *remove({ payload, callback }, { call }) {
-      const response = yield call(APIS.DefaultApi.catidDelete, payload);
+      const response = yield call(APIS.DefaultApi.catIdDelete, payload);
       if (callback && response) callback();
     },
   },
