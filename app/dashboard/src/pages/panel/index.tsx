@@ -1,4 +1,4 @@
-import { Button, Card, Col, Divider, Form, Input, Row, Select, message } from 'antd';
+import { Button, Card, Col, Divider, Form, Input, Row, Select, message, Popconfirm } from 'antd';
 import React, { Component, Fragment } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -32,7 +32,6 @@ interface TableListState {
   currentRow: any;
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
-  stepFormValues: Partial<TableListItem>;
 }
 
 /* eslint react/no-multi-comp:0 */
@@ -117,7 +116,16 @@ class TableList extends Component<TableListProps, TableListState> {
           <Divider type="vertical" />
           <a href="">导入</a>
           <Divider type="vertical" />
-          <a href="">删除</a>
+          <Popconfirm
+            title={`确认删除米表「${record.name}」`}
+            onConfirm={() => {
+              this.handleDelete(record);
+            }}
+            okText="Yes"
+            cancelText="No"
+          >
+            <a>删除</a>
+          </Popconfirm>
         </Fragment>
       ),
     },
@@ -136,6 +144,21 @@ class TableList extends Component<TableListProps, TableListState> {
       type: 'panel/fetchOptions',
     });
   }
+
+  handleDelete = (record: any) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'panel/remove',
+      payload: record,
+      callback: () => {
+        dispatch({
+          type: 'panel/fetch',
+          payload: this.state.formValues,
+        });
+        message.success('删除成功');
+      },
+    });
+  };
 
   handleStandardTableChange = (
     pagination: Partial<TableListPagination>,
@@ -227,11 +250,10 @@ class TableList extends Component<TableListProps, TableListState> {
           type: 'panel/fetch',
           payload: this.state.formValues,
         });
+        message.success(`${isEdit ? '修改' : '添加'}成功`);
+        this.handleModalVisible();
       },
     });
-
-    message.success(`${isEdit ? '修改' : '添加'}成功`);
-    this.handleModalVisible();
   };
 
   renderSimpleForm() {
@@ -294,6 +316,7 @@ class TableList extends Component<TableListProps, TableListState> {
               </Button>
             </div>
             <StandardTable
+              scroll={{ x: 1500 }}
               rowKey="id"
               selectedRows={selectedRows}
               loading={loading}

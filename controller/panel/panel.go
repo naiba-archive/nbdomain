@@ -117,12 +117,25 @@ func Delete(c *gin.Context) {
 	var p model.Panel
 	u := c.MustGet(mygin.KUser).(model.User)
 	if nbdomain.DB.Where("id = ? AND user_id = ?", id, u.ID).First(&p).Error != nil {
-		c.String(http.StatusForbidden, "米表不存在")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "米表不存在",
+		})
 		return
 	}
 	os.Remove("data/upload/logo/" + p.SID() + "-logo.png")
 	os.Remove("data/upload/logo/" + p.SID() + "-logo_en.png")
-	nbdomain.DB.Delete(&p)
+	if e := nbdomain.DB.Delete(&p).Error; e != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("数据库错误：%s", e.Error()),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: id,
+	})
 }
 
 type panelForm struct {
@@ -140,7 +153,6 @@ type panelForm struct {
 
 //Edit 添加/修改米表
 func Edit(c *gin.Context) {
-	var r model.Response
 	var pf panelForm
 	if e := c.ShouldBind(&pf); e != nil {
 		c.JSON(http.StatusOK, model.Response{
@@ -177,7 +189,7 @@ func Edit(c *gin.Context) {
 
 	//如果是修改米表，鉴权
 	var p model.Panel
-	if c.Request.Method == http.MethodPut {
+	if pf.ID != 0 {
 		if nbdomain.DB.Where("id = ? AND user_id = ?", pf.ID, u.ID).First(&p).Error != nil {
 			c.JSON(http.StatusOK, model.Response{
 				Code:    http.StatusBadRequest,
@@ -210,7 +222,7 @@ func Edit(c *gin.Context) {
 	}
 
 	flogo, e, blogo := checkLogo("logo")
-	if !blogo && e != nil && pf.ID != 0 {
+	if !blogo && e != nil && pf.ID == 0 {
 		c.JSON(http.StatusOK, model.Response{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),
@@ -219,7 +231,7 @@ func Edit(c *gin.Context) {
 	}
 
 	flogoEn, e, blogoEn := checkLogo("logo_en")
-	if !blogoEn && e != nil && pf.ID != 0 {
+	if !blogoEn && e != nil && pf.ID == 0 {
 		c.JSON(http.StatusOK, model.Response{
 			Code:    http.StatusBadRequest,
 			Message: fmt.Sprintf("文件上传失败：%s", e.Error()),
@@ -258,7 +270,9 @@ func Edit(c *gin.Context) {
 	if blogoEn {
 		saveLogo(flogoEn, "logo_en")
 	}
-	r.Code = http.StatusOK
-	r.Message = "添加成功"
-	c.JSON(http.StatusOK, r)
+
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: p.ID,
+	})
 }

@@ -75,7 +75,6 @@ func Web() {
 			authUser.GET("panel/:id/export", panel.Export)
 			authUser.GET("panel", panel.List)
 			authUser.POST("panel", panel.Edit)
-			authUser.PUT("panel", panel.Edit)
 			authUser.POST("batch", domain.Batch)
 			// 分类
 			authUser.DELETE("cat/:id", cat.Delete)

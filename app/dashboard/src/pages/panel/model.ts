@@ -22,7 +22,6 @@ export interface ModelType {
     fetchOptions: Effect;
     add: Effect;
     remove: Effect;
-    update: Effect;
   };
   reducers: {
     save: Reducer<StateType>;
@@ -62,23 +61,11 @@ const Model: ModelType = {
         type: 'save',
         payload: response,
       });
-      if (callback) callback();
+      if (callback && response) callback();
     },
-    *remove({ payload, callback }, { call, put }) {
-      const response = yield call(null, payload);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
-      if (callback) callback();
-    },
-    *update({ payload, callback }, { call, put }) {
-      const response = yield call(null, payload);
-      yield put({
-        type: 'save',
-        payload: response,
-      });
-      if (callback) callback();
+    *remove({ payload, callback }, { call }) {
+      const response = yield call(APIS.DefaultApi.panelidDelete, payload);
+      if (callback && response) callback();
     },
   },
 
