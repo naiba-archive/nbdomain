@@ -1,6 +1,7 @@
 import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
-import { TableListData } from './data.d';
+// eslint-disable-next-line
+import { TableListData } from './data';
 
 import { APIS } from '@/services';
 
@@ -20,6 +21,7 @@ export interface ModelType {
     fetch: Effect;
     add: Effect;
     remove: Effect;
+    whois: Effect;
   };
   reducers: {
     save: Reducer<StateType>;
@@ -27,7 +29,7 @@ export interface ModelType {
 }
 
 const Model: ModelType = {
-  namespace: 'cat',
+  namespace: 'domain',
 
   state: {
     data: {
@@ -38,14 +40,14 @@ const Model: ModelType = {
 
   effects: {
     *fetch({ payload }, { call, put }) {
-      const response = yield call(APIS.DefaultApi.catGet, payload);
+      const response = yield call(APIS.DefaultApi.domainGet, payload);
       yield put({
         type: 'save',
         payload: response,
       });
     },
     *add({ payload, callback }, { call, put }) {
-      const response = yield call(APIS.DefaultApi.catPost, payload);
+      const response = yield call(APIS.DefaultApi.domainPost, payload);
       yield put({
         type: 'save',
         payload: response,
@@ -53,8 +55,12 @@ const Model: ModelType = {
       if (callback && response) callback();
     },
     *remove({ payload, callback }, { call }) {
-      const response = yield call(APIS.DefaultApi.catIdDelete, payload);
+      const response = yield call(null, payload);
       if (callback && response) callback();
+    },
+    *whois({ payload, callback }, { call }) {
+      const response = yield call(APIS.DefaultApi.whoisDomainGet, payload);
+      if (callback && response) callback(response);
     },
   },
 

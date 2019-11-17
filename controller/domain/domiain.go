@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -12,6 +13,42 @@ import (
 	"github.com/naiba/nbdomain/model"
 	"github.com/naiba/nbdomain/pkg/mygin"
 )
+
+type loadDomainReq struct {
+	UserID  uint64 `form:"-"`
+	PanelID uint64 `form:"panel_id"`
+	CatID   uint64 `form:"cat_id"`
+	Domain  string `form:"domain"`
+}
+
+//List 域名列表
+func List(c *gin.Context) {
+	var ldr loadDomainReq
+	if err := c.ShouldBindQuery(&ldr); err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		})
+		return
+	}
+	u := c.MustGet(mygin.KUser).(model.User)
+	ldr.UserID = u.ID
+	var respList model.ListData
+	var ts []model.Domain
+	if err := model.AfterPagination(model.WhereQuery(nbdomain.DB.Model(model.Domain{}),
+		ldr), model.BeforePagenation(c), &respList).Find(&ts).Error; err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+	respList.List = ts
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: respList,
+	})
+}
 
 //Delete 删除域名
 func Delete(c *gin.Context) {
@@ -98,43 +135,56 @@ func Batch(c *gin.Context) {
 	c.JSON(http.StatusOK, addedDomains)
 }
 
+type editForm struct {
+	ID      uint64    `json:"id,omitempty"`
+	CatID   uint64    `binding:"required,min=1" json:"cat_id,omitempty"`
+	PanelID uint64    `binding:"required,min=1" json:"panel_id,omitempty"`
+	Domain  string    `binding:"required,min=1,max=64" json:"domain,omitempty"`
+	Desc    string    `binding:"required,min=1,max=200" json:"desc,omitempty"`
+	Cost    int       `binding:"min=1" json:"cost,omitempty"`  //购入成本
+	Renew   int       `binding:"min=1" json:"renew,omitempty"` //续费成本
+	Buy     time.Time `json:"buy,omitempty"`                   //购入时间
+
+	Registrar string    `binding:"min=1,max=100" json:"registrar,omitempty"`
+	Create    time.Time `json:"create,omitempty"` //注册时间
+	Expire    time.Time `json:"expire,omitempty"` //到期时间
+}
+
 //Edit 添加/修改域名
 func Edit(c *gin.Context) {
-	type EditForm struct {
-		CatID     uint64 `binding:"required,min=1"`
-		PanelID   uint64 `binding:"required,min=1"`
-		ID        uint64
-		Create    time.Time //注册时间
-		Expire    time.Time //到期时间
-		Cost      int       `binding:"min=1"` //购入成本
-		Renew     int       `binding:"min=1"` //续费成本
-		Buy       time.Time //购入时间
-		Registrar string    `binding:"min=1,max=100"`
-		Domain    string    `binding:"required,min=1,max=64"`
-		Desc      string    `binding:"required,min=1,max=200"`
-	}
-	var ef EditForm
+	var ef editForm
 	if err := c.ShouldBind(&ef); err != nil {
-		log.Println(err)
-		c.String(http.StatusForbidden, "输入数据不符合规范。")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("输入数据不符合规范：%s", err.Error()),
+		})
 		return
 	}
 	if len(ef.Domain) < 4 {
-		c.String(http.StatusForbidden, "域名格式不符合规范")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "域名格式不符合规范",
+		})
 		return
 	}
 	u := c.MustGet(mygin.KUser).(model.User)
 
 	var cat model.Cat
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.CatID).First(&cat).Error != nil {
-		c.String(http.StatusForbidden, "分类不存在。")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "分类不存在。",
+		})
 		return
 	}
 
 	var d model.Domain
 	if ef.ID != 0 {
 		if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, ef.ID).First(&d).Error != nil {
-			c.String(http.StatusForbidden, "域名不存在。")
+			c.JSON(http.StatusOK, model.Response{
+				Code:    http.StatusBadRequest,
+				Message: "域名不存在。",
+			})
 			return
 		}
 	}
@@ -161,9 +211,14 @@ func Edit(c *gin.Context) {
 		err = nbdomain.DB.Model(&d).Update(d).Error
 	}
 	if err != nil {
-		log.Println(err)
-		c.String(http.StatusInternalServerError, "服务器错误")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: fmt.Sprintf("服务器错误：%s", err.Error()),
+		})
 		return
 	}
-	c.JSON(http.StatusOK, d)
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: d.ID,
+	})
 }

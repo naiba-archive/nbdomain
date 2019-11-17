@@ -6,7 +6,6 @@ import React from 'react';
 const FormItem = Form.Item;
 
 interface CreateFormProps extends FormComponentProps {
-  catOptions: any;
   isEdit: boolean;
   modalVisible: boolean;
   currentRow: any;

@@ -117,7 +117,7 @@ export default {
               path: '/domain',
               name: 'domain',
               icon: 'global',
-              component: './panel',
+              component: './domain',
             },
             {
               path: '/offer',

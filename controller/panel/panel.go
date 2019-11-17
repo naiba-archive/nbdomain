@@ -47,18 +47,6 @@ func Export(c *gin.Context) {
 	c.String(http.StatusOK, string(txt))
 }
 
-//ListDomains 米表域名列表
-func ListDomains(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(model.User)
-	var p model.Panel
-	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
-		c.String(http.StatusForbidden, "米表不存在")
-		return
-	}
-	nbdomain.DB.Model(&p).Related(&p.Domains)
-	c.JSON(http.StatusOK, p.Domains)
-}
-
 type listPanelReq struct {
 	UserID uint64 `form:"-"`
 	Domain string `form:"domain"`

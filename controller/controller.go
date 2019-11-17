@@ -72,7 +72,6 @@ func Web() {
 			authUser.GET("panel", panel.List)
 			authUser.DELETE("panel/:id", panel.Delete)
 			authUser.POST("panel", panel.Edit)
-			authUser.GET("panel/:id/domains", panel.ListDomains)
 			authUser.POST("batch", domain.Batch)
 			authUser.GET("panel/:id/export", panel.Export)
 			// 分类
@@ -80,8 +79,8 @@ func Web() {
 			authUser.POST("cat", cat.Edit)
 			authUser.DELETE("cat/:id", cat.Delete)
 			// 域名
+			authUser.GET("domain", domain.List)
 			authUser.POST("domain", domain.Edit)
-			authUser.PUT("domain", domain.Edit)
 			authUser.DELETE("domain/:id", domain.Delete)
 			// 销售
 			authUser.GET("offers", panel.Offers)

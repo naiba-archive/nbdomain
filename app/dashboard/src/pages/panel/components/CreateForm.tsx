@@ -53,7 +53,7 @@ const CreateForm: React.FC<CreateFormProps> = props => {
         {form.getFieldDecorator('domain', {
           rules: [{ required: true, message: '请输入域名', min: 3 }],
           initialValue: currentRow.domain ? currentRow.domain : '',
-        })(<Input placeholder="nai.ba" />)}
+        })(<Input placeholder="example.com" />)}
       </FormItem>
       <FormItem labelCol={{ span: 6 }} wrapperCol={{ span: 15 }} label="标题「中」">
         {form.getFieldDecorator('name', {

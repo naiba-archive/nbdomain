@@ -34,7 +34,7 @@ type ListData struct {
 func AfterPagination(db *gorm.DB, pq PaginationQuery, data *ListData) *gorm.DB {
 
 	if pq.PageSize <= 0 {
-		pq.PageSize = 20
+		pq.PageSize = 10
 	}
 	data.Pagination.PageSize = pq.PageSize
 

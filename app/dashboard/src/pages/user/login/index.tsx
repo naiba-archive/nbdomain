@@ -92,7 +92,9 @@ class Login extends Component<LoginProps, LoginState> {
               )}
             <UserName
               name="mail"
-              placeholder={`${formatMessage({ id: 'user-login.email.placeholder' })}: hi@nai.ba`}
+              placeholder={`${formatMessage({
+                id: 'user-login.email.placeholder',
+              })}: hi@example.com`}
               rules={[
                 {
                   required: true,

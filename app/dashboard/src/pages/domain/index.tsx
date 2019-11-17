@@ -20,7 +20,8 @@ import { connect } from 'dva';
 import { StateType } from './model';
 import CreateForm from './components/CreateForm';
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
-import { TableListItem, TableListPagination, TableListParams } from './data.d';
+// eslint-disable-next-line
+import { TableListItem, TableListPagination, TableListParams } from './data';
 
 import styles from './style.less';
 
@@ -33,7 +34,7 @@ const getValue = (obj: { [x: string]: string[] }) =>
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<Action>;
   loading: boolean;
-  cat: StateType;
+  domain: StateType;
 }
 
 interface TableListState {
@@ -47,18 +48,18 @@ interface TableListState {
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    cat,
+    domain,
     loading,
   }: {
-    cat: StateType;
+    domain: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    cat,
-    loading: loading.models.cat,
+    domain,
+    loading: loading.models.domain,
   }),
 )
 class TableList extends Component<TableListProps, TableListState> {
@@ -72,26 +73,49 @@ class TableList extends Component<TableListProps, TableListState> {
 
   columns: StandardTableColumnProps[] = [
     {
-      title: '分类ID',
+      title: '域名ID',
       dataIndex: 'id',
+    },
+    {
+      title: '域名',
+      dataIndex: 'domain',
     },
     {
       title: '米表ID',
       dataIndex: 'panel_id',
     },
     {
-      title: '标题[中]',
-      dataIndex: 'name',
+      title: '分类ID',
+      dataIndex: 'cat_id',
     },
     {
-      title: '标题[英]',
-      dataIndex: 'name_en',
+      title: '简介',
+      dataIndex: 'desc',
     },
     {
-      title: '排序',
-      dataIndex: 'index',
+      title: '购入成本',
+      dataIndex: 'cost',
     },
-
+    {
+      title: '续费成本',
+      dataIndex: 'renew',
+    },
+    {
+      title: '购入时间',
+      dataIndex: 'buy',
+    },
+    {
+      title: '注册商',
+      dataIndex: 'registrar',
+    },
+    {
+      title: '注册时间',
+      dataIndex: 'create',
+    },
+    {
+      title: '到期时间',
+      dataIndex: 'expire',
+    },
     {
       title: '管理操作',
       render: (text, record) => (
@@ -110,7 +134,7 @@ class TableList extends Component<TableListProps, TableListState> {
           </a>
           <Divider type="vertical" />
           <Popconfirm
-            title={`确认删除分类「${record.name}」`}
+            title={`确认删除域名「${record.name}」`}
             onConfirm={() => {
               this.handleDelete(record);
             }}
@@ -129,7 +153,7 @@ class TableList extends Component<TableListProps, TableListState> {
     const { formValues } = this.state;
 
     dispatch({
-      type: 'cat/fetch',
+      type: 'domain/fetch',
       payload: formValues,
     });
   }
@@ -137,11 +161,11 @@ class TableList extends Component<TableListProps, TableListState> {
   handleDelete = (record: any) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'cat/remove',
+      type: 'domain/remove',
       payload: record,
       callback: () => {
         dispatch({
-          type: 'cat/fetch',
+          type: 'domain/fetch',
           payload: this.state.formValues,
         });
         message.success('删除成功');
@@ -174,7 +198,7 @@ class TableList extends Component<TableListProps, TableListState> {
     }
 
     dispatch({
-      type: 'cat/fetch',
+      type: 'domain/fetch',
       payload: params,
     });
   };
@@ -186,7 +210,7 @@ class TableList extends Component<TableListProps, TableListState> {
       formValues: {},
     });
     dispatch({
-      type: 'cat/fetch',
+      type: 'domain/fetch',
       payload: {},
     });
   };
@@ -215,7 +239,7 @@ class TableList extends Component<TableListProps, TableListState> {
       });
 
       dispatch({
-        type: 'cat/fetch',
+        type: 'domain/fetch',
         payload: values,
       });
     });
@@ -232,11 +256,11 @@ class TableList extends Component<TableListProps, TableListState> {
   handleAdd = (fields: any, isEdit: boolean) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'cat/add',
+      type: 'domain/add',
       payload: fields,
       callback: () => {
         dispatch({
-          type: 'cat/fetch',
+          type: 'domain/fetch',
           payload: this.state.formValues,
         });
         message.success(`${isEdit ? '修改' : '添加'}成功`);
@@ -252,16 +276,16 @@ class TableList extends Component<TableListProps, TableListState> {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="分类名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
-            </FormItem>
-          </Col>
-          <Col md={4} sm={12}>
             <FormItem label="米表ID">
               {getFieldDecorator('panel_id')(<InputNumber min={1} />)}
             </FormItem>
           </Col>
-          <Col md={4} sm={12}>
+          <Col md={8} sm={24}>
+            <FormItem label="域名称">
+              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
               <Button type="primary" htmlType="submit">
                 查询
@@ -278,8 +302,9 @@ class TableList extends Component<TableListProps, TableListState> {
 
   render() {
     const {
-      cat: { data },
+      domain: { data },
       loading,
+      dispatch,
     } = this.props;
 
     const { selectedRows, modalVisible, isEdit, currentRow } = this.state;
@@ -301,6 +326,7 @@ class TableList extends Component<TableListProps, TableListState> {
             </div>
             <StandardTable
               rowKey="id"
+              scroll={{ x: 1500 }}
               selectedRows={selectedRows}
               loading={loading}
               data={data}
@@ -312,6 +338,7 @@ class TableList extends Component<TableListProps, TableListState> {
         </Card>
         <CreateForm
           {...parentMethods}
+          dispatch={dispatch}
           currentRow={currentRow}
           isEdit={isEdit}
           modalVisible={modalVisible}
