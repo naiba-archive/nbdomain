@@ -1,4 +1,4 @@
-import { Button, Card, Col, Divider, Form, Input, Row, Select, message, Popconfirm } from 'antd';
+import { Button, Card, Col, Divider, Form, Input, Row, message, Popconfirm } from 'antd';
 import React, { Component, Fragment } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -14,7 +14,6 @@ import { TableListItem, TableListPagination, TableListParams } from './data.d';
 import styles from './style.less';
 
 const FormItem = Form.Item;
-const { Option } = Select;
 const getValue = (obj: { [x: string]: string[] }) =>
   Object.keys(obj)
     .map(key => obj[key])
@@ -265,18 +264,13 @@ class TableList extends Component<TableListProps, TableListState> {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
-            <FormItem label="米表名称">
+            <FormItem label="标题">
               {getFieldDecorator('name')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
-            <FormItem label="使用状态">
-              {getFieldDecorator('status')(
-                <Select placeholder="请选择" style={{ width: '100%' }}>
-                  <Option value="0">关闭</Option>
-                  <Option value="1">运行中</Option>
-                </Select>,
-              )}
+            <FormItem label="域名">
+              {getFieldDecorator('domain')(<Input placeholder="请输入" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
