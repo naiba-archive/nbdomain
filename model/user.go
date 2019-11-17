@@ -31,7 +31,7 @@ type User struct {
 
 // AfterFind ..
 func (u *User) AfterFind() {
-	u.Avatar = "https://gravatar.loli.net/avatar/" + com.MD5(u.Mail)
+	u.Avatar = "https://i.pravatar.cc/150?u=" + com.MD5(u.Mail)
 	if u.Name == "" {
 		u.Name = "管理员"
 	}

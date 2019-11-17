@@ -69,6 +69,7 @@ func Web() {
 			// 用户
 			authUser.GET("user", user.GET)
 			authUser.PUT("user", user.Settings)
+			authUser.POST("logout", user.Logout)
 			// 米表
 			authUser.GET("panel", panel.List)
 			authUser.DELETE("panel/:id", panel.Delete)

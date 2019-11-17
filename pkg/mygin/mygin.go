@@ -3,6 +3,7 @@ package mygin
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -31,7 +32,7 @@ func Authorize(o AuthOption) gin.HandlerFunc {
 		if len(token) == 0 {
 			token = ctx.Query("Authorization")
 		}
-		if len(token) < 6 || nbdomain.DB.Where("token = ?", token[6:]).First(&u).Error != nil {
+		if len(token) < 6 || nbdomain.DB.Where("token = ?", token[6:]).First(&u).Error != nil || u.TokenExpire.Before(time.Now()) {
 			if o.NeedAdmin || o.NeedUser {
 				ctx.String(http.StatusUnauthorized, "登录状态已失效，请您重新登录。")
 				ctx.Abort()

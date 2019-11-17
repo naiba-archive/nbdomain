@@ -49,7 +49,7 @@ class Login extends Component<LoginProps, LoginState> {
         type: 'login/login',
         payload: {
           ...values,
-          'auto-login': autoLogin,
+          auto_login: autoLogin,
         },
       });
     }

@@ -3,6 +3,7 @@ package user
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -22,6 +23,17 @@ func GET(c *gin.Context) {
 	r.Code = http.StatusOK
 	r.Result = u
 	c.JSON(http.StatusOK, r)
+}
+
+// Logout ..
+func Logout(c *gin.Context) {
+	u := c.MustGet(mygin.KUser).(model.User)
+	u.Token = nil
+	u.TokenExpire = time.Now()
+	nbdomain.DB.Model(&u).Update(u)
+	c.JSON(http.StatusOK, model.Response{
+		Code: http.StatusOK,
+	})
 }
 
 type loginForm struct {

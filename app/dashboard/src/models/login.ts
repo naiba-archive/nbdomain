@@ -60,7 +60,10 @@ const Model: LoginModelType = {
       }
     },
 
-    *logout(_, { put }) {
+    *logout(_, { put, call }) {
+      yield call(APIS.DefaultApi.logoutPost);
+      localStorage.removeItem('nbdomain-token');
+      localStorage.removeItem('nbdomain-token-expired');
       const { redirect } = getPageQuery();
       // redirect
       if (window.location.pathname !== '/user/login' && !redirect) {
