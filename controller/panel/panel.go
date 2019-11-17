@@ -47,18 +47,6 @@ func Export(c *gin.Context) {
 	c.String(http.StatusOK, string(txt))
 }
 
-//ListCats 米表分类列表
-func ListCats(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(model.User)
-	var p model.Panel
-	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, c.Param("id")).First(&p).Error != nil {
-		c.String(http.StatusForbidden, "米表不存在")
-		return
-	}
-	nbdomain.DB.Model(&p).Related(&p.Cats)
-	c.JSON(http.StatusOK, p.Cats)
-}
-
 //ListDomains 米表域名列表
 func ListDomains(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(model.User)
@@ -72,15 +60,9 @@ func ListDomains(c *gin.Context) {
 }
 
 type listPanelReq struct {
-	UserID     uint64 `form:"-"`
-	ID         uint64 `form:"id"`
-	Domain     string `form:"domain"`
-	Name       string `form:"name"`
-	NameEn     string `form:"name_en"`
-	Desc       string `form:"desc"`
-	DescEn     string `form:"desc_en"`
-	Theme      string `form:"theme"`
-	OfferTheme string `form:"offer_theme"`
+	UserID uint64 `form:"-"`
+	Domain string `form:"domain"`
+	Name   string `form:"name"`
 }
 
 //List 米表列表

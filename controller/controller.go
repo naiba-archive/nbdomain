@@ -69,17 +69,16 @@ func Web() {
 			authUser.GET("user", user.GET)
 			authUser.PUT("user", user.Settings)
 			// 米表
-			authUser.DELETE("panel/:id", panel.Delete)
-			authUser.GET("panel/:id/cats", panel.ListCats)
-			authUser.GET("panel/:id/domains", panel.ListDomains)
-			authUser.GET("panel/:id/export", panel.Export)
 			authUser.GET("panel", panel.List)
+			authUser.DELETE("panel/:id", panel.Delete)
 			authUser.POST("panel", panel.Edit)
+			authUser.GET("panel/:id/domains", panel.ListDomains)
 			authUser.POST("batch", domain.Batch)
+			authUser.GET("panel/:id/export", panel.Export)
 			// 分类
-			authUser.DELETE("cat/:id", cat.Delete)
-			authUser.PUT("cat", cat.Edit)
+			authUser.GET("cat", cat.List)
 			authUser.POST("cat", cat.Edit)
+			authUser.DELETE("cat/:id", cat.Delete)
 			// 域名
 			authUser.POST("domain", domain.Edit)
 			authUser.PUT("domain", domain.Edit)

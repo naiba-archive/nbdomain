@@ -29,7 +29,6 @@ const CreateForm: React.FC<CreateFormProps> = props => {
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      form.resetFields();
       Object.keys(fieldsValue).forEach(k => {
         if (typeof fieldsValue[k] === 'object') {
           fieldsValue[k] = fieldsValue[k].file;

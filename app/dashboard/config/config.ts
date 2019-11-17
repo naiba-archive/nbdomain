@@ -111,7 +111,7 @@ export default {
               name: 'cat',
               icon: 'tags',
               path: '/cat',
-              component: './panel',
+              component: './cat',
             },
             {
               path: '/domain',

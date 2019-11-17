@@ -23,9 +23,9 @@ function onStatusError(error: AxiosError | Error) {
       message: '登录信息失效',
       description: '即将跳转到登录界面',
     });
-    // localStorage.removeItem('nbdomain-token');
-    // localStorage.removeItem('nbdomain-token-expired');
-    // window.location.href = '/user/login';
+    localStorage.removeItem('nbdomain-token');
+    localStorage.removeItem('nbdomain-token-expired');
+    window.location.href = '/user/login';
   }
   notification.error({
     message: `请求错误 ${err.code}`,
