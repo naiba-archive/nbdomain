@@ -134,7 +134,7 @@ class TableList extends Component<TableListProps, TableListState> {
           </a>
           <Divider type="vertical" />
           <Popconfirm
-            title={`确认删除域名「${record.name}」`}
+            title={`确认删除域名「${record.domain}」`}
             onConfirm={() => {
               this.handleDelete(record);
             }}
@@ -276,13 +276,18 @@ class TableList extends Component<TableListProps, TableListState> {
       <Form onSubmit={this.handleSearch} layout="inline">
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
+            <FormItem label="域名称">
+              {getFieldDecorator('domain')(<Input placeholder="请输入" />)}
+            </FormItem>
+          </Col>
+          <Col md={4} sm={12}>
             <FormItem label="米表ID">
               {getFieldDecorator('panel_id')(<InputNumber min={1} />)}
             </FormItem>
           </Col>
-          <Col md={8} sm={24}>
-            <FormItem label="域名称">
-              {getFieldDecorator('name')(<Input placeholder="请输入" />)}
+          <Col md={4} sm={12}>
+            <FormItem label="分类ID">
+              {getFieldDecorator('cat_id')(<InputNumber min={1} />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>

@@ -56,10 +56,17 @@ func Delete(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(model.User)
 	var d model.Domain
 	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, id).First(&d).Error != nil {
-		c.String(http.StatusForbidden, "域名不存在。")
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: "域名不存在。",
+		})
 		return
 	}
 	nbdomain.DB.Delete(&d)
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: id,
+	})
 }
 
 type batchForm struct {

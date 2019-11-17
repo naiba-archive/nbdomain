@@ -55,7 +55,7 @@ const Model: ModelType = {
       if (callback && response) callback();
     },
     *remove({ payload, callback }, { call }) {
-      const response = yield call(null, payload);
+      const response = yield call(APIS.DefaultApi.domainIdDelete, payload);
       if (callback && response) callback();
     },
     *whois({ payload, callback }, { call }) {

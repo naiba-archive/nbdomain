@@ -2,6 +2,7 @@ export interface TableListItem {
   id: number;
   name: string;
   name_en: string;
+  domain: string;
   desc: string;
   desc_en: string;
   updatedAt: Date;
