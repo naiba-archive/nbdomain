@@ -134,12 +134,12 @@ class TableList extends Component<TableListProps, TableListState> {
           </a>
           <Divider type="vertical" />
           <Popconfirm
-            title={`确认删除域名「${record.domain}」`}
+            title={`确认删除「${record.domain}」`}
             onConfirm={() => {
               this.handleDelete(record);
             }}
-            okText="Yes"
-            cancelText="No"
+            okText="确认"
+            cancelText="取消"
           >
             <a>删除</a>
           </Popconfirm>

@@ -123,7 +123,7 @@ export default {
               path: '/offer',
               name: 'offer',
               icon: 'dollar',
-              component: './panel',
+              component: './offer',
             },
             {
               component: './404',

@@ -12,6 +12,7 @@ import (
 	"github.com/naiba/nbdomain/controller/cat"
 	"github.com/naiba/nbdomain/controller/domain"
 	"github.com/naiba/nbdomain/controller/mibiao"
+	"github.com/naiba/nbdomain/controller/offer"
 	"github.com/naiba/nbdomain/controller/panel"
 	"github.com/naiba/nbdomain/controller/user"
 	"github.com/naiba/nbdomain/controller/whois"
@@ -83,7 +84,8 @@ func Web() {
 			authUser.POST("domain", domain.Edit)
 			authUser.DELETE("domain/:id", domain.Delete)
 			// 销售
-			authUser.GET("offers", panel.Offers)
+			authUser.GET("offer", offer.List)
+			authUser.DELETE("offer/:id", offer.Delete)
 			// 其他
 			authUser.GET("panel_option", func(c *gin.Context) {
 				var r model.Response

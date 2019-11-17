@@ -16,13 +16,6 @@ import (
 	"github.com/naiba/nbdomain/pkg/mygin"
 )
 
-//Offers 报价列表
-func Offers(c *gin.Context) {
-	u := c.MustGet(mygin.KUser).(model.User)
-	nbdomain.DB.Model(&u).Related(&u.Offers)
-	c.JSON(http.StatusOK, u.Offers)
-}
-
 //Export 导出米表
 func Export(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(model.User)

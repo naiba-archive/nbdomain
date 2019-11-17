@@ -18,7 +18,6 @@ func init() {
 		model.Cat{},
 		model.Domain{},
 		model.Offer{},
-		model.Order{},
 	)
 }
 

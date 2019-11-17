@@ -23,10 +23,10 @@ type User struct {
 	QQ          string    `json:"qq,omitempty"`
 	Weixin      string    `json:"weixin,omitempty"`
 
-	Domains []Domain `json:"domains,omitempty"`
-	Panels  []Panel  `json:"panels,omitempty"`
-	Cats    []Cat    `json:"cats,omitempty"`
-	Offers  []Offer  `json:"offers,omitempty"`
+	Domains []Domain `json:"-"`
+	Panels  []Panel  `json:"-"`
+	Cats    []Cat    `json:"-"`
+	Offers  []Offer  `json:"-"`
 }
 
 // AfterFind ..

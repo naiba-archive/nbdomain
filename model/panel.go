@@ -39,8 +39,8 @@ type Panel struct {
 	OfferTheme   string `json:"offer_theme,omitempty"`
 
 	User    User     `json:"-"`
-	Cats    []Cat    `json:"cats,omitempty"`
-	Domains []Domain `json:"domains,omitempty"`
+	Cats    []Cat    `json:"-"`
+	Domains []Domain `json:"-"`
 }
 
 //SID 字符串ID

@@ -114,8 +114,8 @@ class TableList extends Component<TableListProps, TableListState> {
             onConfirm={() => {
               this.handleDelete(record);
             }}
-            okText="Yes"
-            cancelText="No"
+            okText="确认"
+            cancelText="取消"
           >
             <a>删除</a>
           </Popconfirm>

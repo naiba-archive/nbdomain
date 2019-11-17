@@ -20,7 +20,7 @@ type Domain struct {
 	Registrar   string    `json:"registrar,omitempty"` //注册平台
 	Desc        string    `json:"desc,omitempty"`
 
-	User  User  `json:",omitempty"`
-	Panel Panel `json:",omitempty"`
-	Cat   Cat   `json:",omitempty"`
+	User  User  `json:"-"`
+	Panel Panel `json:"-"`
+	Cat   Cat   `json:"-"`
 }
