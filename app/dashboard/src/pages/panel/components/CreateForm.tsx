@@ -9,21 +9,21 @@ const FormItem = Form.Item;
 interface CreateFormProps extends FormComponentProps {
   panelOptions: any;
   isEdit: boolean;
-  modalVisible: boolean;
+  createModelVisible: boolean;
   currentRow: any;
   handleAdd: (fieldsValue: any, isEdit: boolean) => void;
-  handleModalVisible: () => void;
+  handleCreateModelVisible: () => void;
 }
 
 const CreateForm: React.FC<CreateFormProps> = props => {
   const {
     panelOptions,
-    modalVisible,
+    createModelVisible,
     isEdit,
     currentRow,
     form,
     handleAdd,
-    handleModalVisible,
+    handleCreateModelVisible,
   } = props;
 
   const okHandle = () => {
@@ -42,9 +42,9 @@ const CreateForm: React.FC<CreateFormProps> = props => {
     <Modal
       destroyOnClose
       title={`${isEdit ? '修改' : '新建'}米表`}
-      visible={modalVisible}
+      visible={createModelVisible}
       onOk={okHandle}
-      onCancel={() => handleModalVisible()}
+      onCancel={() => handleCreateModelVisible()}
     >
       {form.getFieldDecorator('id', {
         initialValue: currentRow.id ? currentRow.id : '',

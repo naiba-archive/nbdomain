@@ -12,6 +12,7 @@ import StandardTable, { StandardTableColumnProps } from './components/StandardTa
 import { TableListItem, TableListPagination, TableListParams } from './data.d';
 
 import styles from './style.less';
+import ImportForm from './components/ImportForm';
 
 const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
@@ -26,8 +27,10 @@ interface TableListProps extends FormComponentProps {
 }
 
 interface TableListState {
-  modalVisible: boolean;
+  createModelVisible: boolean;
+  importModalVisible: boolean;
   isEdit: boolean;
+  currentPanel: any;
   currentRow: any;
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
@@ -52,8 +55,10 @@ interface TableListState {
 )
 class TableList extends Component<TableListProps, TableListState> {
   state: TableListState = {
-    modalVisible: false,
+    createModelVisible: false,
+    importModalVisible: false,
     isEdit: false,
+    currentPanel: {},
     currentRow: {},
     selectedRows: [],
     formValues: {},
@@ -102,18 +107,24 @@ class TableList extends Component<TableListProps, TableListState> {
                 ...prevState,
                 currentRow: record,
                 isEdit: true,
-                modalVisible: true,
+                createModelVisible: true,
               }))
             }
           >
             修改
           </a>
           <Divider type="vertical" />
-          <a href="">分类</a>
-          <Divider type="vertical" />
-          <a href="">域名</a>
-          <Divider type="vertical" />
-          <a href="">导入</a>
+          <a
+            onClick={() => {
+              this.setState(prevState => ({
+                ...prevState,
+                currentPanel: record,
+              }));
+              this.handleImportModelVisible(true);
+            }}
+          >
+            导入
+          </a>
           <Divider type="vertical" />
           <a href="">导出</a>
           <Divider type="vertical" />
@@ -233,11 +244,18 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
-  handleModalVisible = (flag?: boolean) => {
+  handleCreateModelVisible = (flag?: boolean) => {
     this.setState({
-      modalVisible: !!flag,
+      createModelVisible: !!flag,
       currentRow: {},
       isEdit: false,
+    });
+  };
+
+  handleImportModelVisible = (flag?: boolean) => {
+    this.setState({
+      importModalVisible: !!flag,
+      currentPanel: {},
     });
   };
 
@@ -252,7 +270,23 @@ class TableList extends Component<TableListProps, TableListState> {
           payload: this.state.formValues,
         });
         message.success(`${isEdit ? '修改' : '添加'}成功`);
-        this.handleModalVisible();
+        this.handleCreateModelVisible();
+      },
+    });
+  };
+
+  handleImport = (fields: any) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'panel/add',
+      payload: fields,
+      callback: () => {
+        dispatch({
+          type: 'panel/fetch',
+          payload: this.state.formValues,
+        });
+        message.success('导入成功');
+        this.handleCreateModelVisible();
       },
     });
   };
@@ -294,12 +328,14 @@ class TableList extends Component<TableListProps, TableListState> {
       loading,
     } = this.props;
 
-    const { selectedRows, modalVisible, isEdit, currentRow } = this.state;
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
+    const {
+      selectedRows,
+      createModelVisible,
+      isEdit,
+      currentPanel,
+      currentRow,
+      importModalVisible,
+    } = this.state;
 
     return (
       <PageHeaderWrapper>
@@ -307,12 +343,16 @@ class TableList extends Component<TableListProps, TableListState> {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderSimpleForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button
+                icon="plus"
+                type="primary"
+                onClick={() => this.handleCreateModelVisible(true)}
+              >
                 新建
               </Button>
             </div>
             <StandardTable
-              scroll={{ x: 1500 }}
+              scroll={{ x: 2400 }}
               rowKey="id"
               selectedRows={selectedRows}
               loading={loading}
@@ -323,12 +363,19 @@ class TableList extends Component<TableListProps, TableListState> {
             />
           </div>
         </Card>
+        <ImportForm
+          panel={currentPanel}
+          importModalVisible={importModalVisible}
+          handleImport={this.handleImport}
+          handleImportModalVisible={this.handleImportModelVisible}
+        />
         <CreateForm
-          {...parentMethods}
+          handleAdd={this.handleAdd}
+          handleCreateModelVisible={this.handleCreateModelVisible}
           currentRow={currentRow}
           isEdit={isEdit}
           panelOptions={panelOptions}
-          modalVisible={modalVisible}
+          createModelVisible={createModelVisible}
         />
       </PageHeaderWrapper>
     );
