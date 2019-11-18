@@ -126,7 +126,16 @@ class TableList extends Component<TableListProps, TableListState> {
             导入
           </a>
           <Divider type="vertical" />
-          <a href="">导出</a>
+          <Popconfirm
+            title={`确认导出米表「${record.name}」的分类与域名？`}
+            onConfirm={() => {
+              this.handleExport(record);
+            }}
+            okText="确认"
+            cancelText="取消"
+          >
+            <a>导出</a>
+          </Popconfirm>
           <Divider type="vertical" />
           <Popconfirm
             title={`确认删除米表「${record.name}」`}
@@ -255,7 +264,6 @@ class TableList extends Component<TableListProps, TableListState> {
   handleImportModelVisible = (flag?: boolean) => {
     this.setState({
       importModalVisible: !!flag,
-      currentPanel: {},
     });
   };
 
@@ -278,17 +286,17 @@ class TableList extends Component<TableListProps, TableListState> {
   handleImport = (fields: any) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'panel/add',
+      type: 'panel/import',
       payload: fields,
       callback: () => {
-        dispatch({
-          type: 'panel/fetch',
-          payload: this.state.formValues,
-        });
         message.success('导入成功');
         this.handleCreateModelVisible();
       },
     });
+  };
+
+  handleExport = (record: any) => {
+    window.open(`/api/panel/${record.id}/export?xtoken=${localStorage.getItem('nbdomain-token')}`);
   };
 
   renderSimpleForm() {

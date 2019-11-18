@@ -17,10 +17,10 @@ interface ImportFormProps extends FormComponentProps {
 const ImportForm: React.FC<ImportFormProps> = props => {
   const { importModalVisible, form, panel, handleImport, handleImportModalVisible } = props;
 
-  const parseDomains = (text: string) => {
+  const parseDomains = (value: string) => {
     let cat: any = null;
     const cats = [];
-    text.split('\n').forEach((line, i) => {
+    value.split('\n').forEach((line, i) => {
       if (i === 0 && !line.startsWith('#')) {
         throw new Error(`第「${i}」行：必须以分类开头`);
       }
@@ -56,8 +56,10 @@ const ImportForm: React.FC<ImportFormProps> = props => {
   const okHandle = () => {
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-      console.log(parseDomains(fieldsValue.text));
-      handleImport(fieldsValue);
+      handleImport({
+        panel_id: fieldsValue.panel_id,
+        cats: parseDomains(fieldsValue.text),
+      });
     });
   };
 
@@ -88,7 +90,7 @@ const ImportForm: React.FC<ImportFormProps> = props => {
           rules: [
             { required: true, message: '请输入导入的域名' },
             {
-              validator: async value => {
+              validator: async (_, value) => {
                 parseDomains(value);
               },
             },

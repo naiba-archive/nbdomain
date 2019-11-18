@@ -21,6 +21,7 @@ export interface ModelType {
     fetch: Effect;
     fetchOptions: Effect;
     add: Effect;
+    import: Effect;
     remove: Effect;
   };
   reducers: {
@@ -41,6 +42,10 @@ const Model: ModelType = {
   },
 
   effects: {
+    *import({ payload, callback }, { call }) {
+      const response = yield call(APIS.DefaultApi.panelImportPost, payload);
+      if (callback && response) callback();
+    },
     *fetch({ payload }, { call, put }) {
       const response = yield call(APIS.DefaultApi.panelGet, payload);
       yield put({
@@ -64,7 +69,7 @@ const Model: ModelType = {
       if (callback && response) callback();
     },
     *remove({ payload, callback }, { call }) {
-      const response = yield call(APIS.DefaultApi.panelidDelete, payload);
+      const response = yield call(APIS.DefaultApi.panelIdDelete, payload);
       if (callback && response) callback();
     },
   },

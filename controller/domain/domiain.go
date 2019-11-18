@@ -2,9 +2,7 @@ package domain
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -67,79 +65,6 @@ func Delete(c *gin.Context) {
 		Code:   http.StatusOK,
 		Result: id,
 	})
-}
-
-type batchForm struct {
-	PanelID uint64 `binding:"required,min=1"`
-	Cats    []struct {
-		Name    string `binding:"required,min=1,max=20"`
-		NameEn  string `binding:"required,min=1,max=30"`
-		Domains []struct {
-			Cost   int `binding:"min=1"` //购入成本
-			Buy    time.Time
-			Renew  int    `binding:"min=1"` //续费成本
-			Domain string `binding:"required,min=1,max=64"`
-			Desc   string `binding:"required,min=1,max=200"`
-		}
-	}
-}
-
-//Batch 批量导入域名
-func Batch(c *gin.Context) {
-	var bf batchForm
-	if err := c.ShouldBind(&bf); err != nil {
-		log.Println(err)
-		c.String(http.StatusForbidden, "输入数据不符合规范。可留空但不可以乱填。")
-		return
-	}
-	for _, cat := range bf.Cats {
-		for _, domain := range cat.Domains {
-			if len(domain.Domain) < 4 {
-				c.String(http.StatusForbidden, domain.Domain+":域名格式不符合规范")
-				return
-			}
-		}
-	}
-	u := c.MustGet(mygin.KUser).(model.User)
-	var p model.Panel
-	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
-		c.String(http.StatusForbidden, "米表不存在。")
-		return
-	}
-	addedDomains := make([]model.Domain, 0)
-	for _, catForm := range bf.Cats {
-		var cat model.Cat
-		if nbdomain.DB.Where("name = ? AND user_id = ?", strings.TrimSpace(catForm.Name), u.ID).First(&cat).Error != nil {
-			cat.Name = catForm.Name
-			cat.NameEn = catForm.NameEn
-			cat.UserID = u.ID
-			cat.PanelID = p.ID
-			if nbdomain.DB.Save(&cat).Error != nil {
-				c.String(http.StatusInternalServerError, "数据库错误，联系管理员")
-				return
-			}
-		}
-		for _, domainForm := range catForm.Domains {
-			var domain model.Domain
-			if nbdomain.DB.Where("domain = ?", domainForm.Domain).First(&domain).Error == nil {
-				continue
-			}
-			domain.UserID = u.ID
-			domain.PanelID = p.ID
-			domain.CatID = cat.ID
-			domain.Buy = domainForm.Buy
-			domain.Cost = domainForm.Cost
-			domain.Renew = domainForm.Renew
-			domain.Domain = domainForm.Domain
-			domain.Desc = domainForm.Desc
-			if nbdomain.DB.Save(&domain).Error != nil {
-				c.String(http.StatusInternalServerError, "数据库错误，联系管理员")
-				return
-			}
-			addedDomains = append(addedDomains, domain)
-		}
-	}
-	c.JSON(http.StatusOK, addedDomains)
 }
 
 type editForm struct {

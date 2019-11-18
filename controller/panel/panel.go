@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -15,6 +16,96 @@ import (
 	"github.com/naiba/nbdomain/model"
 	"github.com/naiba/nbdomain/pkg/mygin"
 )
+
+type batchForm struct {
+	PanelID uint64 `binding:"required,min=1" json:"panel_id,omitempty"`
+	Cats    []struct {
+		Name    string `binding:"required,min=1,max=20" json:"name,omitempty"`
+		NameEn  string `binding:"required,min=1,max=30" json:"name_en,omitempty"`
+		Domains []struct {
+			Cost   int       `binding:"min=1" json:"cost,omitempty"` //购入成本
+			Buy    time.Time `json:"buy,omitempty"`
+			Renew  int       `binding:"min=1" json:"renew,omitempty"` //续费成本
+			Domain string    `binding:"required,min=1,max=64" json:"domain,omitempty"`
+			Desc   string    `binding:"required,min=1,max=200" json:"desc,omitempty"`
+		} `json:"domains,omitempty"`
+	} `json:"cats,omitempty"`
+}
+
+//Import 批量导入域名
+func Import(c *gin.Context) {
+	var bf batchForm
+	if err := c.ShouldBind(&bf); err != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("数据不符合规范：%s", err.Error()),
+		})
+		return
+	}
+	for _, cat := range bf.Cats {
+		for _, domain := range cat.Domains {
+			if len(domain.Domain) < 4 {
+				c.JSON(http.StatusOK, model.Response{
+					Code:    http.StatusBadRequest,
+					Message: fmt.Sprintf("数据不符合规范：%s", domain.Domain),
+				})
+				return
+			}
+		}
+	}
+	u := c.MustGet(mygin.KUser).(model.User)
+	var p model.Panel
+	if nbdomain.DB.Where("user_id = ? AND id = ?", u.ID, bf.PanelID).First(&p).Error != nil {
+		c.JSON(http.StatusOK, model.Response{
+			Code:    http.StatusBadRequest,
+			Message: fmt.Sprintf("米表不存在：%d", bf.PanelID),
+		})
+		return
+	}
+	addedDomains := make([]model.Domain, 0)
+	for _, catForm := range bf.Cats {
+		var cat model.Cat
+		if nbdomain.DB.Where("name = ? AND user_id = ?", strings.TrimSpace(catForm.Name), u.ID).First(&cat).Error != nil {
+			cat.Name = catForm.Name
+			cat.NameEn = catForm.NameEn
+			cat.UserID = u.ID
+			cat.PanelID = p.ID
+			if err := nbdomain.DB.Save(&cat).Error; err != nil {
+				c.JSON(http.StatusOK, model.Response{
+					Code:    http.StatusBadRequest,
+					Message: fmt.Sprintf("数据库错误：%s", err),
+				})
+				return
+			}
+		}
+		for _, domainForm := range catForm.Domains {
+			var domain model.Domain
+			if nbdomain.DB.Where("domain = ?", domainForm.Domain).First(&domain).Error == nil {
+				continue
+			}
+			domain.UserID = u.ID
+			domain.PanelID = p.ID
+			domain.CatID = cat.ID
+			domain.Buy = domainForm.Buy
+			domain.Cost = domainForm.Cost
+			domain.Renew = domainForm.Renew
+			domain.Domain = domainForm.Domain
+			domain.Desc = domainForm.Desc
+			if err := nbdomain.DB.Save(&domain).Error; err != nil {
+				c.JSON(http.StatusOK, model.Response{
+					Code:    http.StatusBadRequest,
+					Message: fmt.Sprintf("数据库错误：%s", err),
+				})
+				return
+			}
+			addedDomains = append(addedDomains, domain)
+		}
+	}
+	c.JSON(http.StatusOK, model.Response{
+		Code:   http.StatusOK,
+		Result: len(addedDomains),
+	})
+}
 
 //Export 导出米表
 func Export(c *gin.Context) {

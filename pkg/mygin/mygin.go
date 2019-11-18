@@ -30,7 +30,7 @@ func Authorize(o AuthOption) gin.HandlerFunc {
 		var u model.User
 		token := ctx.Request.Header.Get("Authorization")
 		if len(token) == 0 {
-			token = ctx.Query("Authorization")
+			token = ctx.Query("token")
 		}
 		if len(token) < 6 || nbdomain.DB.Where("token = ?", token[6:]).First(&u).Error != nil || u.TokenExpire.Before(time.Now()) {
 			if o.NeedAdmin || o.NeedUser {
