@@ -38,14 +38,16 @@ func Web() {
 	})
 	r.LoadHTMLGlob("theme/template/**/*")
 	r.Static("static", "theme/static")
+	r.Static("upload", "data/upload")
+
 	if nbdomain.CF.Debug {
 		conf := cors.DefaultConfig()
 		conf.AllowAllOrigins = true
 		conf.AddAllowMethods("DELETE")
 		conf.AddAllowHeaders("Authorization")
 		r.Use(cors.New(conf))
-		r.Static("upload", "data/upload")
 	}
+
 	r.NoRoute(func(c *gin.Context) {
 		c.Redirect(http.StatusFound, "http://"+c.Request.URL.Hostname())
 	})
