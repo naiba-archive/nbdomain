@@ -60,6 +60,7 @@ func Web() {
 		})
 		panelRouter.GET("allowed", mibiao.Allow)
 	}
+
 	api := r.Group("/api")
 	{
 		api.POST("login", user.Login)
