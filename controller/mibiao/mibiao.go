@@ -36,10 +36,9 @@ func checkExpire(c *gin.Context) bool {
 		}
 		//取米表详情
 		nbdomain.DB.Model(&d).Related(&d.Panel)
-		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.Domain+"/offer/"+domain)
+		c.Redirect(http.StatusTemporaryRedirect, "https://"+d.Panel.Domain+"/offer/"+domain)
 		return false
 	}
-	//是米表，检查会员到期
 	nbdomain.DB.Model(&p).Related(&p.User)
 	//设置默认主题
 	if p.Theme == "" {
