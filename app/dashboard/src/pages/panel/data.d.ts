@@ -1,4 +1,6 @@
 export interface TableListItem {
+  total_buy: number;
+  total_renew: number;
   id: number;
   name: string;
   name_en: string;

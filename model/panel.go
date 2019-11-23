@@ -2,6 +2,8 @@ package model
 
 import (
 	"fmt"
+
+	"github.com/jinzhu/gorm"
 )
 
 //ThemeList 主题列表
@@ -38,9 +40,24 @@ type Panel struct {
 	Theme        string `json:"theme,omitempty"`
 	OfferTheme   string `json:"offer_theme,omitempty"`
 
-	User    User     `json:"-"`
-	Cats    []Cat    `json:"-"`
-	Domains []Domain `json:"-"`
+	TotalRenew uint64   `gorm:"-" json:"total_renew,omitempty"`
+	TotalBuy   uint64   `gorm:"-" json:"total_buy,omitempty"`
+	User       User     `gorm:"-" json:"-"`
+	Cats       []Cat    `gorm:"-" json:"-"`
+	Domains    []Domain `gorm:"-" json:"-"`
+}
+
+type sumResult struct {
+	Renew uint64
+	Buy   uint64
+}
+
+// Stat ..
+func (p *Panel) Stat(db *gorm.DB) {
+	var r sumResult
+	db.Model(Domain{}).Select("sum(buy) as buy,sum(renew) as renew").Where("panel_id = ?", p.ID).Scan(&r)
+	p.TotalRenew = r.Renew
+	p.TotalBuy = r.Buy
 }
 
 //SID 字符串ID

@@ -78,24 +78,14 @@ class TableList extends Component<TableListProps, TableListState> {
       dataIndex: 'name',
     },
     {
-      title: '标题[英]',
-      dataIndex: 'name_en',
+      title: '建仓成本',
+      dataIndex: 'total_buy',
+      render: (value, record) => <p>{record.total_buy ? value : '0'} 元</p>,
     },
     {
-      title: '米表主题',
-      dataIndex: 'theme',
-    },
-    {
-      title: '报价页主题',
-      dataIndex: 'offer_theme',
-    },
-    {
-      title: '简介[中]',
-      dataIndex: 'desc',
-    },
-    {
-      title: '简介[英]',
-      dataIndex: 'desc_en',
+      title: '持仓成本',
+      dataIndex: 'total_renew',
+      render: (value, record) => <p>{record.total_renew ? value : '0'} 元</p>,
     },
     {
       title: '管理操作',
@@ -360,7 +350,7 @@ class TableList extends Component<TableListProps, TableListState> {
               </Button>
             </div>
             <StandardTable
-              scroll={{ x: 2400 }}
+              // scroll={{ x: 2400 }}
               rowKey="id"
               selectedRows={selectedRows}
               loading={loading}

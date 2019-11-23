@@ -158,6 +158,9 @@ func List(c *gin.Context) {
 		})
 		return
 	}
+	for i := 0; i < len(ts); i++ {
+		ts[i].Stat(nbdomain.DB)
+	}
 	respList.List = ts
 	c.JSON(http.StatusOK, model.Response{
 		Code:   http.StatusOK,

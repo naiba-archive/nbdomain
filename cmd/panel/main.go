@@ -17,7 +17,7 @@ import (
 	"github.com/naiba/nbdomain/model"
 )
 
-const licenseIP = "1.1.1.1"
+const licenseIP = "119.28.16.232"
 const licenseDomain = "localhost"
 
 var licenseUntil time.Time
