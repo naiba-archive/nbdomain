@@ -73,9 +73,9 @@ type editForm struct {
 	PanelID uint64    `binding:"required,min=1" json:"panel_id,omitempty"`
 	Domain  string    `binding:"required,min=1,max=64" json:"domain,omitempty"`
 	Desc    string    `binding:"required,min=1,max=200" json:"desc,omitempty"`
-	Cost    int       `binding:"min=1" json:"cost,omitempty"`  //购入成本
-	Renew   int       `binding:"min=1" json:"renew,omitempty"` //续费成本
-	Buy     time.Time `json:"buy,omitempty"`                   //购入时间
+	Cost    int       `json:"cost,omitempty"`  //购入成本
+	Renew   int       `json:"renew,omitempty"` //续费成本
+	Buy     time.Time `json:"buy,omitempty"`   //购入时间
 
 	Registrar string    `binding:"min=1,max=100" json:"registrar,omitempty"`
 	Create    time.Time `json:"create,omitempty"` //注册时间
