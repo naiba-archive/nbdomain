@@ -48,16 +48,16 @@ type Panel struct {
 }
 
 type sumResult struct {
-	Renew uint64
-	Buy   uint64
+	Trenew uint64
+	Tbuy   uint64
 }
 
 // Stat ..
 func (p *Panel) Stat(db *gorm.DB) {
 	var r sumResult
-	db.Model(Domain{}).Select("sum(buy) as buy,sum(renew) as renew").Where("panel_id = ?", p.ID).Scan(&r)
-	p.TotalRenew = r.Renew
-	p.TotalBuy = r.Buy
+	db.Model(Domain{}).Select("sum(cost) as tbuy,sum(renew) as trenew").Where("panel_id = ?", p.ID).Scan(&r)
+	p.TotalRenew = r.Trenew
+	p.TotalBuy = r.Tbuy
 }
 
 //SID 字符串ID
