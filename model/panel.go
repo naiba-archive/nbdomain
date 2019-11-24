@@ -42,9 +42,9 @@ type Panel struct {
 
 	TotalRenew uint64   `gorm:"-" json:"total_renew,omitempty"`
 	TotalBuy   uint64   `gorm:"-" json:"total_buy,omitempty"`
-	User       User     `gorm:"-" json:"-"`
-	Cats       []Cat    `gorm:"-" json:"-"`
-	Domains    []Domain `gorm:"-" json:"-"`
+	User       User     `json:"-"`
+	Cats       []Cat    `json:"-"`
+	Domains    []Domain `json:"-"`
 }
 
 type sumResult struct {
