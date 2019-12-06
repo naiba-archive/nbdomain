@@ -1,0 +1,20 @@
+version: "3.3"
+
+services:
+  caddy:
+  mysql:
+    image: mysql:8
+    volumes:
+      - ./data/db:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_DATABASE: nbdomain
+  nbdomain:
+    depends_on:
+      - caddy
+      - mysql
+    build: ./nbdomain
+    restart: always
+    volumes:
+      - ./data/pay:/afpg/data

@@ -6,3 +6,7 @@ cmd/panel/theme
 cmd/panel/data/config.yaml
 cmd/panel/data/upload/logo/*
 !cmd/panel/data/upload/logo/.gitkeep
+cmd/installer/nbdomain/theme/*
+!cmd/installer/nbdomain/theme/.gitkeep
+cmd/installer/dashboard/*
+!cmd/installer/dashboard/.gitkeep
