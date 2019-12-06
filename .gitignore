@@ -1,12 +1,16 @@
 .DS_Store
 vendor/
 release/
+
 cmd/panel/main
 cmd/panel/theme
 cmd/panel/data/config.yaml
 cmd/panel/data/upload/logo/*
 !cmd/panel/data/upload/logo/.gitkeep
-cmd/installer/nbdomain/theme
+
 cmd/installer/data
+cmd/installer/nbdomain/*
+!cmd/installer/nbdomain/将二进制和theme文件放在这里.txt
+!cmd/installer/nbdomain/Dockerfile
 cmd/installer/dashboard/*
 !cmd/installer/dashboard/.gitkeep
