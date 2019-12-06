@@ -25,7 +25,7 @@ var loc *time.Location
 
 func init() {
 	var err error
-	licenseUntil, err = time.Parse("2006-01-02", "2020-10-01")
+	licenseUntil, err = time.Parse("2006-01-02", "2099-12-31")
 	if err != nil {
 		panic(err)
 	}
