@@ -89,7 +89,7 @@ confirm_restart() {
 }
 
 before_show_menu() {
-    echo && echo -n -e "${yellow}按回车返回主菜单: ${plain}" && read temp
+    echo && echo -n -e "${yellow}* 按回车返回主菜单 *${plain}" && read temp
     show_menu
 }
 
@@ -109,20 +109,24 @@ install_soft() {
 
 install() {
     install_base
+
     command -v docker >/dev/null 2>&1
     if [[ $? != 0 ]]; then
         echo -e "正在安装 Docker"
-        bash <(curl -sL https://get.docker.com)
+        bash <(curl -sL https://get.docker.com) >/dev/null 2>&1
         if [[ $? != 0 ]]; then
             echo -e "${red}下载脚本失败，请检查本机能否连接 get.docker.com${plain}"
             return 0
         fi
+        systemctl enable docker.service
+        systemctl start docker.service
         echo -e "${green}Docker${plain} 安装成功"
     fi
+
     command -v docker-compose >/dev/null 2>&1
     if [[ $? != 0 ]]; then
         echo -e "正在安装 Docker Compose"
-        curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &&
+        curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose >/dev/null 2>&1 &&
             chmod +x /usr/local/bin/docker-compose
         if [[ $? != 0 ]]; then
             echo -e "${red}下载脚本失败，请检查本机能否连接 github.com${plain}"
@@ -130,8 +134,10 @@ install() {
         fi
         echo -e "${green}Docker Compose${plain} 安装成功"
     fi
-    rebuild
-    modify_config
+
+    modify_config 0
+    rebuild 0
+    start 0
 
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -139,8 +145,8 @@ install() {
 }
 
 rebuild() {
-    echo -e "开始构建系统镜像"
-    docker-compose build --no-cache nbdomain
+    echo -e "> 构建系统镜像"
+    docker-compose build --no-cache nbdomain >/dev/null 2>&1
     if [[ $? == 0 ]]; then
         echo -e "系统镜像 ${green}构建成功${plain}"
     else
@@ -153,22 +159,25 @@ rebuild() {
 }
 
 modify_config() {
+    echo -e "> 修改系统配置"
     mkdir -p data/nbdomain/
     mkdir -p data/caddy/
     cp ./config.yaml data/nbdomain/config.yaml
     cp ./Caddyfile data/caddy/Caddyfile
-    echo && read -p "请输入管理后台域名: " domain
-    read -p "请输入 reCAPTCHA Site-Key: " site_key
-    read -p "请输入管理员邮箱: " admin_email
+    read -p "请输入管理后台域名: " domain &&
+        read -p "请输入 reCAPTCHA Site-Key: " site_key &&
+        read -p "请输入管理员邮箱: " admin_email
     if [[ -z "${domain}" || -z "${site_key}" || -z "${admin_email}" ]]; then
         echo -e "${red}所有选项都不能为空${plain}"
         before_show_menu
         return 1
     fi
+
     sed -i "s/^example.com/${domain}/" data/caddy/Caddyfile
-    sed -i "s/^master@example.com/${admin_email}/" data/caddy/Caddyfile
-    sed -i "s/^example.com/${domain}/" data/nbdomain/config.yaml
-    sed -i "s/^recaptcha_site_key/${site_key}/" data/nbdomain/config.yaml
+    sed -i "s/master@example.com/${admin_email}/" data/caddy/Caddyfile
+    sed -i "s/example.com/${domain}/" data/nbdomain/config.yaml
+    sed -i "s/recaptcha_site_key/${site_key}/" data/nbdomain/config.yaml
+    echo -e "系统配置 ${green}修改成功，请重新编译镜像并启动${plain}"
 
     if [[ $# == 0 ]]; then
         before_show_menu
@@ -190,7 +199,7 @@ start() {
 
 stop() {
     docker-compose down
-    if [[ $? == 1 ]]; then
+    if [[ $? == 0 ]]; then
         echo -e "${green}奶霸米表 停止成功${plain}"
     else
         echo -e "${red}米表停止失败，请稍后查看日志信息${plain}"
@@ -239,7 +248,7 @@ check_install() {
 show_usage() {
     echo "奶霸米表 管理脚本使用方法: "
     echo "------------------------------------------"
-    echo "./nbdomain.sh              - 显示管理菜单 (功能更多)"
+    echo "./nbdomain.sh              - 显示管理菜单"
     echo "./nbdomain.sh install      - 安装"
     echo "./nbdomain.sh rebuild      - 重建镜像"
     echo "./nbdomain.sh config       - 修改配置"
@@ -261,12 +270,11 @@ show_menu() {
     ————————————————
     ${green}3.${plain} 修改配置
     ————————————————
-    ${green}4.${plain} 启动 奶霸米表
-    ${green}5.${plain} 停止 奶霸米表
-    ${green}6.${plain} 重启 奶霸米表
-    ${green}7.${plain} 查看 奶霸米表 日志
+    ${green}4.${plain} 启动
+    ${green}5.${plain} 停止
+    ${green}6.${plain} 重启
+    ${green}7.${plain} 查看日志
     "
-    show_status
     echo && read -p "请输入选择 [0-14]: " num
 
     case "${num}" in
@@ -274,7 +282,7 @@ show_menu() {
         exit 0
         ;;
     1)
-        check_uninstall && install
+        install
         ;;
     2)
         check_install && rebuild

@@ -86,7 +86,7 @@ func Import(c *gin.Context) {
 			domain.UserID = u.ID
 			domain.PanelID = p.ID
 			domain.CatID = cat.ID
-			domain.Buy = domainForm.Buy
+			domain.Buy = &domainForm.Buy
 			domain.Cost = domainForm.Cost
 			domain.Renew = domainForm.Renew
 			domain.Domain = domainForm.Domain

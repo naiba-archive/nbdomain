@@ -17,8 +17,8 @@ import (
 	"github.com/naiba/nbdomain/model"
 )
 
-const licenseIP = "119.28.16.232"
-const licenseDomain = "localhost"
+var licenseIP string
+var licenseDomain string
 
 var licenseUntil time.Time
 var loc *time.Location
@@ -92,10 +92,9 @@ func checkLicense() error {
 	if err != nil {
 		return err
 	}
-	log.Println(tm.ClientIP, nbdomain.CF.Web.Domain)
 	if tm.ClientIP != licenseIP || nbdomain.CF.Web.Domain != licenseDomain ||
 		time.Now().In(loc).After(licenseUntil) {
-		log.Println("本产品未经授权，或授权已失效，请联系奶爸")
+		log.Println("本产品未经授权，或授权已失效，请联系奶爸", nbdomain.CF.Web.Domain)
 		os.Exit(0)
 	}
 	return nil
@@ -118,11 +117,12 @@ func updateWhois() {
 					register = parsed.Registrar.Name
 				}
 			}
+			now := time.Now()
 			nbdomain.DB.Model(&domain).UpdateColumns(model.Domain{
 				Registrar:   register,
-				Create:      create,
-				Expire:      expire,
-				WhoisUpdate: time.Now(),
+				Create:      &create,
+				Expire:      &expire,
+				WhoisUpdate: &now,
 			})
 			time.Sleep(time.Minute)
 		}

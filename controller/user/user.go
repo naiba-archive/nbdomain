@@ -29,7 +29,8 @@ func GET(c *gin.Context) {
 func Logout(c *gin.Context) {
 	u := c.MustGet(mygin.KUser).(model.User)
 	u.Token = nil
-	u.TokenExpire = time.Now()
+	now := time.Now()
+	u.TokenExpire = &now
 	nbdomain.DB.Model(&u).Update(u)
 	c.JSON(http.StatusOK, model.Response{
 		Code: http.StatusOK,

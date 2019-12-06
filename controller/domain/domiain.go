@@ -77,7 +77,7 @@ type editForm struct {
 	Renew   int       `json:"renew,omitempty"` //续费成本
 	Buy     time.Time `json:"buy,omitempty"`   //购入时间
 
-	Registrar string    `binding:"min=1,max=100" json:"registrar,omitempty"`
+	Registrar string    `binding:"omitempty,max=100" json:"registrar,omitempty"`
 	Create    time.Time `json:"create,omitempty"` //注册时间
 	Expire    time.Time `json:"expire,omitempty"` //到期时间
 }
@@ -126,12 +126,13 @@ func Edit(c *gin.Context) {
 	d.Domain = ef.Domain
 	d.Desc = ef.Desc
 	d.UserID = u.ID
-	d.Create = ef.Create
-	d.Expire = ef.Expire
-	if d.Expire.After(time.Now()) {
-		d.WhoisUpdate = time.Now()
+	d.Create = &ef.Create
+	d.Expire = &ef.Expire
+	var now = time.Now()
+	if d.Expire.After(now) {
+		d.WhoisUpdate = &now
 	}
-	d.Buy = ef.Buy
+	d.Buy = &ef.Buy
 	d.Cost = ef.Cost
 	d.Renew = ef.Renew
 	d.Registrar = ef.Registrar
