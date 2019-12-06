@@ -286,7 +286,9 @@ class TableList extends Component<TableListProps, TableListState> {
   };
 
   handleExport = (record: any) => {
-    window.open(`/api/panel/${record.id}/export?xtoken=${localStorage.getItem('nbdomain-token')}`);
+    window.open(
+      `/api/panel/${record.id}/export?token=xtoken${localStorage.getItem('nbdomain-token')}`,
+    );
   };
 
   renderSimpleForm() {
