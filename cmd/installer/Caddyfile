@@ -1,0 +1,36 @@
+example.com {
+   tls master@example.com
+   root /data/dashboard
+   proxy /api nbdomain:8080 {
+      timeout 5m
+      keepalive 50
+      transparent
+   }
+   rewrite {
+      if {path} not_match ^/api
+      to {path} {path}/ /
+   }
+}
+example.com/upload/ {
+   root /data/upload/
+}
+example.com/static/ {
+   root /data/static/
+}
+:80 {
+   proxy / nbdomain:8080 {
+      timeout 5m
+      keepalive 50
+      transparent
+   }
+}
+:443 {
+   tls {
+      ask http://nbdomain:8080/allowed
+   }
+   proxy / nbdomain:8080 {
+      timeout 5m
+      keepalive 50
+      transparent
+   }
+}

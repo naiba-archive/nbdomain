@@ -2,10 +2,23 @@ version: "3.3"
 
 services:
   caddy:
+    image: abiosoft/caddy
+    restart: always
+    environment:
+      - ACME_AGREE=true
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./data/caddy/Caddyfile:/etc/Caddyfile
+      - ./data/caddy/certs:/root/.caddy
+      - ./nbdomain/theme/static/:/data/static/
+      - ./data/nbdomain/upload/:/data/upload/
+      - ./dashboard/:/data/dashboard/
   mysql:
     image: mysql:8
     volumes:
-      - ./data/db:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: myrootpassword
@@ -17,4 +30,4 @@ services:
     build: ./nbdomain
     restart: always
     volumes:
-      - ./data/pay:/afpg/data
+      - ./data/nbdomain:/data/data

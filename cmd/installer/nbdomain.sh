@@ -65,7 +65,7 @@ elif [[ x"${release}" == x"debian" ]]; then
 fi
 
 # -1: 未安装, 0: 已运行, 1: 未运行
-sprov_ui_status=-1
+nbdomain_status=-1
 
 confirm() {
     if [[ $# > 1 ]]; then
@@ -113,26 +113,29 @@ install_soft() {
 
 install() {
     install_base
-    echo -e "正在安装 Docker"
-    bash <(curl -fsSL https://get.docker.com -o get-docker.sh)
+    command -v docker >/dev/null 2>&1
     if [[ $? != 0 ]]; then
-        echo -e "${red}下载脚本失败，请检查本机能否连接 get.docker.com${plain}"
-        return 0
+        echo -e "正在安装 Docker"
+        bash <(curl -sL https://get.docker.com)
+        if [[ $? != 0 ]]; then
+            echo -e "${red}下载脚本失败，请检查本机能否连接 get.docker.com${plain}"
+            return 0
+        fi
+        echo -e "${green}Docker${plain} 安装成功"
     fi
-    echo -e "${green}Docker${plain} 安装成功"
-
-    echo -e "正在安装 Docker Compose"
-    curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
-        chmod +x /usr/local/bin/docker-compose
+    command -v docker-compose >/dev/null 2>&1
     if [[ $? != 0 ]]; then
-        echo -e "${red}下载脚本失败，请检查本机能否连接 github.com${plain}"
-        return 0
+        echo -e "正在安装 Docker Compose"
+        curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
+            chmod +x /usr/local/bin/docker-compose
+        if [[ $? != 0 ]]; then
+            echo -e "${red}下载脚本失败，请检查本机能否连接 github.com${plain}"
+            return 0
+        fi
+        echo -e "${green}Docker Compose${plain} 安装成功"
     fi
-    echo -e "${green}Docker Compose${plain} 安装成功"
-
     echo -e "构建系统镜像"
-    docker build --no-cache 
-
+    docker-compose build --no-cache nbdomain
 }
 
 update() {

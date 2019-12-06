@@ -1,0 +1,11 @@
+debug: false
+web:
+  addr: 0.0.0.0:8080
+  domain: example.com
+database:
+  user: root
+  pass: myrootpassword
+  server: tcp(mysql:3306)
+  name: nbdomain
+  loc: Asia%2fShanghai
+recaptcha: recaptcha_site_key
