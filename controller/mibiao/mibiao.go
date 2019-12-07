@@ -5,12 +5,13 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/bobesa/go-domain-util/domainutil"
+	"github.com/gin-gonic/gin"
+	"golang.org/x/net/idna"
+
 	"github.com/naiba/nbdomain"
 	"github.com/naiba/nbdomain/model"
 	"github.com/naiba/nbdomain/service"
-
-	"github.com/gin-gonic/gin"
-	"golang.org/x/net/idna"
 )
 
 func checkExpire(c *gin.Context) bool {
@@ -25,10 +26,14 @@ func checkExpire(c *gin.Context) bool {
 	}
 	var p model.Panel
 	err = nbdomain.DB.Where("domain = ?", domain).First(&p).Error
+	topLevelDomain := domainutil.Domain(domain)
+	if err != nil {
+		err = nbdomain.DB.Where("domain = ?", topLevelDomain).First(&p).Error
+	}
 	if err != nil {
 		//不是米表，试试域名
 		var d model.Domain
-		err = nbdomain.DB.Where("domain = ?", domain).First(&d).Error
+		err = nbdomain.DB.Where("domain = ?", topLevelDomain).First(&d).Error
 		//未找到域名，跳转平台首页
 		if err != nil {
 			c.Redirect(http.StatusTemporaryRedirect, "https://"+nbdomain.CF.Web.Domain)
