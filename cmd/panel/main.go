@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -112,8 +111,8 @@ func updateWhois() {
 				var parsed parser.WhoisInfo
 				parsed, err = parser.Parse(result)
 				if err == nil {
-					create, _ = parseTime(parsed.Domain.CreatedDate)
-					expire, _ = parseTime(parsed.Domain.ExpirationDate)
+					create = model.ParseWhoisTime(parsed.Domain.CreatedDate)
+					expire = model.ParseWhoisTime(parsed.Domain.ExpirationDate)
 					register = parsed.Registrar.Name
 				}
 			}
@@ -128,28 +127,4 @@ func updateWhois() {
 		}
 		time.Sleep(time.Hour)
 	}
-}
-
-var timeLayouts = []string{
-	"2006-01-02T15:04:05-0700",
-	"2006-01-02 15:04:05",
-	"2006-01-02T15:04:05Z",
-	"2006-01-02",
-	"02.01.2006 15:04:05",
-	time.RFC1123,     //= "Mon, 02 Jan 2006 15:04:05 MST"
-	time.RFC1123Z,    //= "Mon, 02 Jan 2006 15:04:05 -0700" // RFC1123 with numeric zone
-	time.RFC850,      //= "Monday, 02-Jan-06 15:04:05 MST"
-	time.RFC3339,     //= "2006-01-02T15:04:05Z07:00"
-	time.RFC3339Nano, //= "2006-01-02T15:04:05.999999999Z07:00"
-}
-
-func parseTime(t string) (tt time.Time, e error) {
-	for _, layout := range timeLayouts {
-		tt, e = time.Parse(layout, t)
-		if e == nil {
-			return
-		}
-	}
-	e = errors.New("解析失败")
-	return
 }

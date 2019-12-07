@@ -26,6 +26,8 @@ func Whois(c *gin.Context) {
 		var parsed parser.WhoisInfo
 		parsed, err = parser.Parse(result)
 		if err == nil {
+			parsed.Domain.CreatedDate = fmt.Sprintf("%s", model.ParseWhoisTime(parsed.Domain.CreatedDate))
+			parsed.Domain.ExpirationDate = fmt.Sprintf("%s", model.ParseWhoisTime(parsed.Domain.ExpirationDate))
 			c.JSON(http.StatusOK, model.Response{
 				Code:   http.StatusOK,
 				Result: parsed,
