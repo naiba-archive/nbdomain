@@ -14,7 +14,7 @@ import (
 	"github.com/naiba/nbdomain/service"
 )
 
-func checkExpire(c *gin.Context) bool {
+func checkRedirect(c *gin.Context) bool {
 	var err error
 	domain := stripPort(c.Request.Host)
 	if strings.Contains(domain, "xn--") {
@@ -28,7 +28,11 @@ func checkExpire(c *gin.Context) bool {
 	err = nbdomain.DB.Where("domain = ?", domain).First(&p).Error
 	topLevelDomain := domainutil.Domain(domain)
 	if err != nil {
-		err = nbdomain.DB.Where("domain = ?", topLevelDomain).First(&p).Error
+		if topLevelDomain != "" {
+			err = nbdomain.DB.Where("domain = ?", topLevelDomain).First(&p).Error
+		} else {
+			topLevelDomain = domain
+		}
 	}
 	if err != nil {
 		//不是米表，试试域名
@@ -76,7 +80,7 @@ func Allow(c *gin.Context) {
 
 //Index 米表首页
 func Index(c *gin.Context) {
-	if !checkExpire(c) {
+	if !checkRedirect(c) {
 		return
 	}
 	p := c.MustGet("Panel").(model.Panel)
@@ -101,7 +105,7 @@ func Index(c *gin.Context) {
 
 //Offer 报价页
 func Offer(c *gin.Context) {
-	if !checkExpire(c) {
+	if !checkRedirect(c) {
 		return
 	}
 	p := c.MustGet("Panel").(model.Panel)
