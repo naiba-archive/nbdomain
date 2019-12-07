@@ -313,7 +313,7 @@ show_menu() {
 if [[ $# > 0 ]]; then
     case $1 in
     "install")
-        check_install 0 && install 0
+        install 0
         ;;
     "rebuild")
         check_install 0 && rebuild 0
