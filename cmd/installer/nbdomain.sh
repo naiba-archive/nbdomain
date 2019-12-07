@@ -110,6 +110,10 @@ install_soft() {
 install() {
     install_base
 
+    # 上传文件夹
+    mkdir -p data/nbdomain/upload/logo
+    chmod 777 -R data/nbdomain/upload
+
     command -v docker >/dev/null 2>&1
     if [[ $? != 0 ]]; then
         echo -e "正在安装 Docker"
