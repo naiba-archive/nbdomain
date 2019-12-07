@@ -165,9 +165,10 @@ modify_config() {
     cp ./config.yaml data/nbdomain/config.yaml
     cp ./Caddyfile data/caddy/Caddyfile
     read -p "请输入管理后台域名: " domain &&
-        read -p "请输入 reCAPTCHA Site-Key: " site_key &&
-        read -p "请输入管理员邮箱: " admin_email
-    if [[ -z "${domain}" || -z "${site_key}" || -z "${admin_email}" ]]; then
+        read -p "请输入管理员邮箱: " admin_email &&
+        read -p "请输入 reCAPTCHA Key: " recaptcha_key
+    read -p "请输入 reCAPTCHA Secret: " recaptcha_secret
+    if [[ -z "${domain}" || -z "${recaptcha_key}" || -z "${recaptcha_secret}" || -z "${admin_email}" ]]; then
         echo -e "${red}所有选项都不能为空${plain}"
         before_show_menu
         return 1
@@ -176,7 +177,8 @@ modify_config() {
     sed -i "s/^example.com/${domain}/" data/caddy/Caddyfile
     sed -i "s/master@example.com/${admin_email}/" data/caddy/Caddyfile
     sed -i "s/example.com/${domain}/" data/nbdomain/config.yaml
-    sed -i "s/recaptcha_site_key/${site_key}/" data/nbdomain/config.yaml
+    sed -i "s/recaptcha_site_key/${recaptcha_key}/" data/nbdomain/config.yaml
+    sed -i "s/recaptcha_site_secret/${recaptcha_secret}/" data/nbdomain/config.yaml
     echo -e "系统配置 ${green}修改成功，请重新编译镜像并启动${plain}"
 
     if [[ $# == 0 ]]; then

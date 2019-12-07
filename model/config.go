@@ -21,5 +21,8 @@ type Config struct {
 		Name   string
 		Loc    string
 	}
-	ReCaptcha string `mapstructure:"recaptcha"`
+	ReCaptcha struct {
+		Key    string
+		Secret string
+	} `mapstructure:"recaptcha"`
 }

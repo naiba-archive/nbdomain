@@ -14,4 +14,6 @@ database:
   server: tcp(127.0.0.1:3306)
   name: panel
   loc: Asia%2fShanghai
-recaptcha: xxxxxxxxxxxxxxxxxxxxxxxx
+recaptcha:
+  key: recaptcha_site_key
+  secret: recaptcha_site_secret

@@ -119,11 +119,12 @@ func Offer(c *gin.Context) {
 			title = d.Domain + " may be for sale - " + p.NameEn
 		}
 		c.HTML(http.StatusOK, p.OfferTheme+"/offer", gin.H{
-			"Static":  "https://" + nbdomain.CF.Web.Domain,
-			"Title":   title,
-			"Panel":   p,
-			"Domain":  d,
-			"Chinese": isChinese,
+			"Static":    "https://" + nbdomain.CF.Web.Domain,
+			"Title":     title,
+			"Panel":     p,
+			"Domain":    d,
+			"ReCaptcha": nbdomain.CF.ReCaptcha.Key,
+			"Chinese":   isChinese,
 		})
 	} else {
 		// 提交报价
