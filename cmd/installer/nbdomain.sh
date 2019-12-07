@@ -166,8 +166,8 @@ modify_config() {
     echo -e "> 修改系统配置"
     mkdir -p data/nbdomain/
     mkdir -p data/caddy/
-    cp ./config.yaml data/nbdomain/config.yaml
-    cp ./Caddyfile data/caddy/Caddyfile
+    cp -rf ./config.yaml data/nbdomain/config.yaml
+    cp -rf ./Caddyfile data/caddy/Caddyfile
     read -p "请输入管理后台域名: " domain &&
         read -p "请输入管理员邮箱: " admin_email &&
         read -p "请输入 reCAPTCHA Key: " recaptcha_key
