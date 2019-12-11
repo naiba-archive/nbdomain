@@ -60,7 +60,7 @@ func checkRedirect(c *gin.Context) bool {
 	c.Set("Panel", p)
 	c.Set("Chinese", strings.Contains(c.Request.Header.Get("accept-language"), "zh"))
 	// 强制 HTTPS
-	c.Writer.Header().Add("Strict-Transport-Security", fmt.Sprintf("max-age=%d", 60*60*24*7))
+	c.Writer.Header().Add("Strict-Transport-Security", fmt.Sprintf("max-age=%d; preload", 60*60*24*7*18))
 	return true
 }
 
