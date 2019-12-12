@@ -1,7 +1,6 @@
 package mibiao
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -59,8 +58,6 @@ func checkRedirect(c *gin.Context) bool {
 	}
 	c.Set("Panel", p)
 	c.Set("Chinese", strings.Contains(c.Request.Header.Get("accept-language"), "zh"))
-	// 强制 HTTPS
-	c.Writer.Header().Add("Strict-Transport-Security", fmt.Sprintf("max-age=%d; preload", 60*60*24*7*18))
 	return true
 }
 
@@ -87,6 +84,11 @@ func Index(c *gin.Context) {
 		return
 	}
 	p := c.MustGet("Panel").(model.Panel)
+	// 强制 HTTPS
+	if c.Request.Header.Get("X-Forwarded-Proto") != "https" {
+		c.Redirect(http.StatusTemporaryRedirect, "https://"+p.Domain)
+		return
+	}
 	nbdomain.DB.Model(&p).Order("index").Association("cats").Find(&p.Cats)
 	for i := 0; i < len(p.Cats); i++ {
 		nbdomain.DB.Model(&p.Cats[i]).Related(&p.Cats[i].Domains)
