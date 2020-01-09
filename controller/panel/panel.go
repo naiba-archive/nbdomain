@@ -182,6 +182,12 @@ func Delete(c *gin.Context) {
 	}
 	os.Remove("data/upload/logo/" + p.SID() + "-logo.png")
 	os.Remove("data/upload/logo/" + p.SID() + "-logo_en.png")
+	nbdomain.DB.Delete(&model.Domain{
+		PanelID: p.ID,
+	})
+	nbdomain.DB.Delete(&model.Cat{
+		PanelID: p.ID,
+	})
 	if e := nbdomain.DB.Delete(&p).Error; e != nil {
 		c.JSON(http.StatusOK, model.Response{
 			Code:    http.StatusInternalServerError,
