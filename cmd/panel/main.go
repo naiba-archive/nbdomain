@@ -1,14 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/beevik/ntp"
 	whois "github.com/likexian/whois-go"
 	parser "github.com/likexian/whois-parser-go"
 	"github.com/naiba/nbdomain"
@@ -53,11 +54,6 @@ func main() {
 	}
 }
 
-type worldTime struct {
-	ClientIP string    `json:"client_ip,omitempty"`
-	Datetime time.Time `json:"datetime,omitempty"`
-}
-
 func license() {
 	var errTime int
 	for {
@@ -77,22 +73,22 @@ func license() {
 }
 
 func checkLicense() error {
-	resp, err := http.Get("https://worldtimeapi.org/api/timezone/Asia/Shanghai")
+	ntpTime, err := ntp.Time("ntp.xtom.com.hk")
 	if err != nil {
 		return err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	resp, err := http.Get("https://api-ipv4.ip.sb/ip")
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
-	var tm worldTime
-	err = json.Unmarshal(body, &tm)
+	ipB, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-	if tm.ClientIP != licenseIP || nbdomain.CF.Web.Domain != licenseDomain ||
-		time.Now().In(loc).After(licenseUntil) {
+	ip := strings.TrimSpace(string(ipB))
+	if ip != licenseIP || nbdomain.CF.Web.Domain != licenseDomain ||
+		ntpTime.In(loc).After(licenseUntil) {
 		log.Println("本产品未经授权，或授权已失效，请联系奶爸", nbdomain.CF.Web.Domain)
 		os.Exit(0)
 	}
